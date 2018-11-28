@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[hexo的gitment评论报错]]></title>
+    <url>%2F2018%2F11%2F28%2Fhexogitmenterror%2F</url>
+    <content type="text"><![CDATA[gitment评论报错今天发现我博客hexo采用的github issue的评论系统gitment出现了以下报错：所有评论Error: API rate limit exceeded for 107.178.194.84. (But here’s the good news: Authenticated requests get a higher rate limit. Check out the documentation for more details.)解决方案：无需解决原因：这是github的自我保护机制，防止未登陆用户重复调用API。点击下方github登陆按钮登陆后，错误消失。]]></content>
+      <categories>
+        <category>博客</category>
+      </categories>
+      <tags>
+        <tag>hexo</tag>
+        <tag>gitment</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[XX-Net科学上网]]></title>
     <url>%2F2018%2F11%2F28%2Fxxnet%2F</url>
     <content type="text"><![CDATA[前言Great Wall 不多说，中国特色，哈哈哈。 XX-Net这个跟之前用的GoAgent貌似一样的原理，先去谷歌申请一个小应用程序，然后利用这个来科学上网。详细介绍都在GitHub上XX-Net，目前有25539个星。可以自己去谷歌申请appid，也可以用xx-net自带的。网速还可以，目前用的最好用的科学上网工具，支持windows、mac、Android。本方法需要ipv6隧道，如果用mac连接手机热点，且手机支持4G，则可以直接上网。如果是宽带，需要配置ipv6协议，教程上有详细说明。]]></content>
