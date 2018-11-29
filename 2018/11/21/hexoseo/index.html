@@ -91,7 +91,7 @@
 <meta property="og:image" content="https://www.tanrd.com/2018/11/21/hexoseo/3.jpeg">
 <meta property="og:image" content="https://www.tanrd.com/2018/11/21/hexoseo/5.jpeg">
 <meta property="og:image" content="https://www.tanrd.com/2018/11/21/hexoseo/7.jpeg">
-<meta property="og:updated_time" content="2018-11-28T06:56:12.000Z">
+<meta property="og:updated_time" content="2018-11-29T03:39:34.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Hexo next主题SEO优化">
 <meta name="twitter:description" content="前言我在大学期间使用过ZBlog、WordPress等博客系统。而Hexo与这两者的区别在于，Hexo是静态博客系统。Hexo无需数据库作为存储，也无需服务器端渲染，直接将页面以Html的格式输出给用户。全球最大男性交友社区github提供了GitPage解决方案，使得开发者可以直接将静态Html页面发布到web上。这样也避免了购买web云服务器，却只用来处理静态页面的不划算，免费的总是最好的。">
@@ -414,9 +414,9 @@
       
 
       
-        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>我在大学期间使用过ZBlog、WordPress等博客系统。而Hexo与这两者的区别在于，Hexo是静态博客系统。Hexo无需数据库作为存储，也无需服务器端渲染，直接将页面以Html的格式输出给用户。全球最大男性交友社区github提供了GitPage解决方案，使得开发者可以直接将静态Html页面发布到web上。这样也避免了购买web云服务器，却只用来处理静态页面的不划算，免费的总是最好的。</p>
-<h1 id="GitPage"><a href="#GitPage" class="headerlink" title="GitPage"></a>GitPage</h1><p>我们可以将Hexo生成的页面push到GitPage中来发布，GitPage是Github提供的个人页面的个性化展示空间。可以通过创建一个Repository，进入设置页面激活GitPage，而后可以通过 (<em>用户名.github.io</em>) 的方式访问。<a href="https://www.tanrd.com">wpstan.github.io</a>。GitPage非常友好的提供了域名映射，我们可以使用自己简短的域名来访问博客，例如本站的域名<a href="https://www.tanrd.com">tanRD.com</a>。</p>
-<h1 id="SEO-之-keywords"><a href="#SEO-之-keywords" class="headerlink" title="SEO 之 keywords"></a>SEO 之 keywords</h1><p>搜索引擎会在页面的&lt;head>标签中查询&lt;keywords>的mete定义，收录时会根据keywords进行索引，因此这个很有必要进行优化。打开_config.yml文件，找到keywords所在的行，添加自己希望通过搜索引擎索引的关键字。关键字个数五六个应该就差不多了，关键字个数对搜索引擎的具体影响，我也不懂。</p>
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>我在大学期间使用过ZBlog、WordPress等博客系统。而Hexo与这两者的区别在于，Hexo是静态博客系统。Hexo无需数据库作为存储，也无需服务器端渲染，直接将页面以Html的格式输出给用户。全球最大男性交友社区github提供了GitPage解决方案，使得开发者可以直接将静态Html页面发布到web上。这样也避免了购买web云服务器，却只用来处理静态页面的不划算，免费的总是最好的。</p>
+<h3 id="GitPage"><a href="#GitPage" class="headerlink" title="GitPage"></a>GitPage</h3><p>我们可以将Hexo生成的页面push到GitPage中来发布，GitPage是Github提供的个人页面的个性化展示空间。可以通过创建一个Repository，进入设置页面激活GitPage，而后可以通过 (<em>用户名.github.io</em>) 的方式访问。<a href="https://www.tanrd.com">wpstan.github.io</a>。GitPage非常友好的提供了域名映射，我们可以使用自己简短的域名来访问博客，例如本站的域名<a href="https://www.tanrd.com">tanRD.com</a>。</p>
+<h3 id="SEO-之-keywords"><a href="#SEO-之-keywords" class="headerlink" title="SEO 之 keywords"></a>SEO 之 keywords</h3><p>搜索引擎会在页面的&lt;head>标签中查询&lt;keywords>的mete定义，收录时会根据keywords进行索引，因此这个很有必要进行优化。打开_config.yml文件，找到keywords所在的行，添加自己希望通过搜索引擎索引的关键字。关键字个数五六个应该就差不多了，关键字个数对搜索引擎的具体影响，我也不懂。</p>
 <p>上述改动是针对首页的关键字优化，我们还必须优化每一个文章页面的keywords,打开/themes/next/layout/_partials/head.swig文件，找到以下代码：<img src="/2018/11/21/hexoseo/2.jpeg" title="keywords设置代码"><a id="more"></a><br>通过上述代码可以知道，next首先去页面上找keywords，没有就使用tags标签来设置keywords值，再没有就使用主题设置的keywords。我这里将keywords在页面脚手架中定义，使得在new 文章的时候，默认带上这个参数，这样就可以自定义添加keywords了。同时修改上述代码，将页面中自定义的keywords以及页面标签作为最后的keywords。<img src="/2018/11/21/hexoseo/4.jpeg" title="修改keywords生成规则">下面是本文的顶部标题，</p>
 <pre><code>title: Hexo next主题SEO优化
 date: 2018-11-21 19:10:30
@@ -590,7 +590,7 @@ Sitemap: https://www.tanrd.com/baidusitemap.xml
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">文章</span>
                 </a>
               </div>
@@ -601,7 +601,7 @@ Sitemap: https://www.tanrd.com/baidusitemap.xml
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">3</span>
+                  <span class="site-state-item-count">4</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -612,7 +612,7 @@ Sitemap: https://www.tanrd.com/baidusitemap.xml
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-count">8</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
@@ -661,7 +661,7 @@ Sitemap: https://www.tanrd.com/baidusitemap.xml
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GitPage"><span class="nav-number">2.</span> <span class="nav-text">GitPage</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SEO-之-keywords"><span class="nav-number">3.</span> <span class="nav-text">SEO 之 keywords</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SEO-之-静态URL"><span class="nav-number">4.</span> <span class="nav-text">SEO 之 静态URL</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SEO-之-百度搜索引擎"><span class="nav-number">5.</span> <span class="nav-text">SEO 之 百度搜索引擎</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SEO-之-SiteMap"><span class="nav-number">6.</span> <span class="nav-text">SEO 之 SiteMap</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SEO-之-robots-txt"><span class="nav-number">7.</span> <span class="nav-text">SEO 之 robots.txt</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GitPage"><span class="nav-number">2.</span> <span class="nav-text">GitPage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SEO-之-keywords"><span class="nav-number">3.</span> <span class="nav-text">SEO 之 keywords</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#SEO-之-静态URL"><span class="nav-number"></span> <span class="nav-text">SEO 之 静态URL</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SEO-之-百度搜索引擎"><span class="nav-number"></span> <span class="nav-text">SEO 之 百度搜索引擎</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SEO-之-SiteMap"><span class="nav-number"></span> <span class="nav-text">SEO 之 SiteMap</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SEO-之-robots-txt"><span class="nav-number"></span> <span class="nav-text">SEO 之 robots.txt</span></a></li></div>
             
 
           </div>
