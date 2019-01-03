@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://www.tanrd.com/about/index.html</loc>
+    
+    <lastmod>2019-01-03T13:05:16.018Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://www.tanrd.com/2018/12/17/2018summary/</loc>
     
     <lastmod>2018-12-29T09:33:10.301Z</lastmod>
@@ -12,13 +19,6 @@
     <loc>https://www.tanrd.com/2018/12/07/dns/</loc>
     
     <lastmod>2018-12-07T09:06:07.934Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://www.tanrd.com/about/index.html</loc>
-    
-    <lastmod>2018-12-01T15:03:48.361Z</lastmod>
     
   </url>
   
