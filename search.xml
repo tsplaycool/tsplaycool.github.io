@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[SpringCloud Gateway自定义过滤器实现IP Hash路由]]></title>
+    <url>%2F2019%2F01%2F14%2FRouteToRequestUrl%2F</url>
+    <content type="text"><![CDATA[现状公司转型微服务架构，将之前机器上所有已部署微服务拆分集群部署。微服务地址采用资源管理平台统一管理维护，包括微服务IP、集群数据等，未采用服务注册与发现组件。需求1、从资源管理平台获取服务器IP地址等相关参数；2、相同源IP转发到相同服务器，采用IP Hash方式；实现SpringCloud Gateway支持自定义过滤器，通过继承RouteToRequestUrlFilter类来实现IP Hash。SpringCloud Gateway过滤器分为两类，Gateway Filter和Global Filter，前者是针对匹配命中的过滤，有两种方式来实现，实现GatewayFilter接口、继承AbstractGatewayFilterFactory类，后者是针对全局路由的过滤器，可以采用添加@Component注解的方式来注册。SpringCloud Gateway的全局过滤器如下图所示：我们需要做的就是实现一个自定义的全局过滤器CustomRouteToRequestUrlFilter，在该过滤器中设置IP Hash后的真实URL地址。代码如下：CustomRouteToRequestUrlFilter.java1234567891011121314151617181920212223@Component public class CustomRouteToRequestUrlFilter extends RouteToRequestUrlFilter &#123; private List&lt;String&gt; mUrlList = new ArrayList&lt;String&gt;() &#123; &#123; add("http://10.0.0.1"); add("http://10.0.0.2"); add("http://10.0.0.3"); &#125; &#125;; @Override public int getOrder() &#123; return 10001; &#125; @Override public Mono&lt;Void&gt; filter(ServerWebExchange exchange, GatewayFilterChain chain) &#123; ServerHttpRequest request = exchange.getRequest(); String address = request.getRemoteAddress().getAddress().getHostAddress(); int num = Math.abs(address.hashCode()) % mUrlList.size(); URI mergedUrl = URI.create(mUrlList.get(num)); exchange.getAttributes().put(ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR, mergedUrl); return chain.filter(exchange); &#125;&#125;以上代码可以通过优化，增加”x-forward-for”以获取真实IP地址。此处暂略。WebFlux通过ServerWebExchange类来处理Http Request和Http Response。首先取得IP地址，然后将IP地址做Hash得到一个整型，再根据服务器数量求余，最后得到所选择的服务器。以上代码需要注意的地方在于，需要设置Order为10001，大于RouteToRequestUrlFilter的返回值（10000），这样才能将优先级置于RouteToRequestUrlFilter之下。]]></content>
+      <categories>
+        <category>微服务</category>
+      </categories>
+      <tags>
+        <tag>微服务</tag>
+        <tag>IP Hash</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[SpringCloud Gateway基于静态URL的Ribbon负载均衡]]></title>
     <url>%2F2019%2F01%2F09%2FgatewayRibbon%2F</url>
     <content type="text"><![CDATA[前言SpringCloud Gateway是Netflix旗下开源的API网关，项目比较新，网上资源也比较少，因此坑比较多吧。说到SpringCloud Gateway，肯定都会与Zuul进行对比。Zuul分为Zuul1和Zuul2两个版本，Zuul1是采用同步阻塞的方式，使用多线程来实现，而Zuul2则是采用异步非阻塞的事件驱动。SpringCloud Gateway与Zuul2一样，基于异步非阻塞的事件驱动。而SpringCloud Zuul则是采用的Zuul1这个同步阻塞的方式，可能是由于Zuul2出来比较慢，Netflix等不及了，就自己搞了一个异步非阻塞的SpringCloud Gateway。有人在Github提问，SpringCloud 后续是否会集成Zuul2，官方给了否定答复。既然都有了异步非阻塞的Gateway，那么也就没必要再集成Zuul2到SpringCloud了。两者的性能对比（zuul1和Gateway），https://github.com/spencergibb/spring-cloud-gateway-bench 。ProxyAvg LatencyAvg Req/Sec/Threadgateway6.61ms3.24klinkered7.62ms2.82kzuul12.56ms2.09knone2.09ms11.77k需求1、根据配置，将指定源IP路由到某台特定的服务器，以便灰度发布验证。2、采用Web端进行路由配置更新。3、默认规则，采用IP Hash路由到固定服务器。根据以上三个需求点，只需要使用API网关与负载均衡器，不需要服务注册与发现组件，因此需要采用静态URL进行路由配置。根据多方面权衡以及业务可行性分析，技术栈决定采用SpringCloud Gateway。原因有以下几点：1、Gateway支持 RemoteAddr Route Predicate Factory，可以满足需求点1。2、Gateway支持 Actuator API，支持RestFul刷新路由配置，可以满足需求点2。3、采用Ribbon，自定义路由规则，以及支持静态服务器地址配置，可以满足需求点3。实现application.yml12345678910111213141516171819202122spring: cloud: gateway: routes: -id: wpstan uri: lb://customRibbon predicates: -RemoteAddr=99.6.150.163ribbon: eureka: enabled: false //必须要关闭eureka的服务注册与发现customRibbon: ribbon: NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule //随机规则 listOfServers: http://99.12.98.215:8080,http://99.12.98.215:8081,http://99.12.98.215:8082management: endpoints: web: exposure: include: '*'//配置actuator api使用，暴露端点 第六行的lb表示匹配规则为loadBalance负载均衡，规则名为customRibbon。第十二行表示该负载均衡规则采用Ribbon，后面就是Ribbon的配置。主要就是listOfServers这个静态URL配置，由于我不需要去动态获取服务注册与发现，因此可以在此写死。需要注意的就是必须要把ribbon.eureka.enabled置为false。]]></content>
@@ -8,8 +20,8 @@
         <category>微服务</category>
       </categories>
       <tags>
-        <tag>SpringCloud</tag>
         <tag>微服务</tag>
+        <tag>SpringCloud</tag>
       </tags>
   </entry>
   <entry>
