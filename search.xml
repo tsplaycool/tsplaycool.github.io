@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[SpringCloud高版本的zuul路由状态查看]]></title>
+    <url>%2F2019%2F01%2F16%2Fzuul%2F</url>
+    <content type="text"><![CDATA[前言最近在研究SpringCloud Zuul的时候，发现通过 /routes无法查看路由信息，上网搜索了一些信息，发现都是低版本的SpringCloud的解决方案。Finchley版本和Greenwich版本并不适用。低版本的SpringCloud是基于springboot1 的版本，可以通过以下方式配置：1、引入spring-cloud-starter-zuul2、引入spring-boot-starter-actuator3、properties文件设置management.security.enabled=false4、访问/routes显示端点信息，访问/routes?format=details显示详细的端点信息SpringCloud高版本由于Finchley版本和Greenwich版本的Spring Cloud采用pringBoot2.0，security的操作有改动，导致management.security.enabled=false会报错：Deprecated:A global security auto-configuration is now provided…”而且zuul的代码全部放到了Netflix包下，访问/routes的方式也有所变化，具体的操作步骤如下：1、引入spring-cloud-starter-netflix-zuul2、引入spring-boot-starter-actuator3、properties文件设置management.endpoints.web.exposure.include=*4、访问/actuator/routes显示端点信息，访问/actuator/routes/details显示详细的端点信息]]></content>
+      <categories>
+        <category>微服务</category>
+      </categories>
+      <tags>
+        <tag>zuul</tag>
+        <tag>微服务</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[SpringCloud Gateway自定义过滤器实现IP Hash路由]]></title>
     <url>%2F2019%2F01%2F14%2FRouteToRequestUrl%2F</url>
     <content type="text"><![CDATA[现状公司转型微服务架构，将之前机器上所有已部署微服务拆分集群部署。微服务地址采用资源管理平台统一管理维护，包括微服务IP、集群数据等，未采用服务注册与发现组件。需求1、从资源管理平台获取服务器IP地址等相关参数；2、相同源IP转发到相同服务器，采用IP Hash方式；实现SpringCloud Gateway支持自定义过滤器，通过继承RouteToRequestUrlFilter类来实现IP Hash。SpringCloud Gateway过滤器分为两类，Gateway Filter和Global Filter，前者是针对匹配命中的过滤，有两种方式来实现，实现GatewayFilter接口、继承AbstractGatewayFilterFactory类，后者是针对全局路由的过滤器，可以采用添加@Component注解的方式来注册。SpringCloud Gateway的全局过滤器如下图所示：我们需要做的就是实现一个自定义的全局过滤器CustomRouteToRequestUrlFilter，在该过滤器中设置IP Hash后的真实URL地址。代码如下：CustomRouteToRequestUrlFilter.java1234567891011121314151617181920212223@Component public class CustomRouteToRequestUrlFilter extends RouteToRequestUrlFilter &#123; private List&lt;String&gt; mUrlList = new ArrayList&lt;String&gt;() &#123; &#123; add("http://10.0.0.1"); add("http://10.0.0.2"); add("http://10.0.0.3"); &#125; &#125;; @Override public int getOrder() &#123; return 10001; &#125; @Override public Mono&lt;Void&gt; filter(ServerWebExchange exchange, GatewayFilterChain chain) &#123; ServerHttpRequest request = exchange.getRequest(); String address = request.getRemoteAddress().getAddress().getHostAddress(); int num = Math.abs(address.hashCode()) % mUrlList.size(); URI mergedUrl = URI.create(mUrlList.get(num)); exchange.getAttributes().put(ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR, mergedUrl); return chain.filter(exchange); &#125;&#125;以上代码可以进行优化，通过处理”x-forward-for”以获取真实IP地址。此处暂略。WebFlux通过ServerWebExchange类来处理Http Request和Http Response。首先取得IP地址，然后将IP地址做Hash得到一个整型，再根据服务器数量求余，最后得到所选择的服务器。以上代码需要注意的地方在于，需要设置Order为10001，大于RouteToRequestUrlFilter的返回值（10000），这样才能将优先级置于RouteToRequestUrlFilter之下。]]></content>
