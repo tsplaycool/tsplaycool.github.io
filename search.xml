@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[【学习笔记】用户态与内核态]]></title>
+    <url>%2F2019%2F02%2F25%2Fuserandkernal%2F</url>
+    <content type="text"><![CDATA[前言最近在学习Netty，学习五种IO模型，其中涉及一些时间片轮转，上下文切换的东西，自14年考完研后，这些东西都忘光了。百度搜索了一些关于用户态与内核态的知识，特记录一下以防遗忘。]]></content>
+      <categories>
+        <category>操作系统</category>
+      </categories>
+      <tags>
+        <tag>学习笔记</tag>
+        <tag>操作系统</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[SpringCloud高版本的zuul路由状态查看]]></title>
     <url>%2F2019%2F01%2F16%2Fzuul%2F</url>
-    <content type="text"><![CDATA[前言最近在研究SpringCloud Zuul的时候，发现通过 /routes无法查看路由信息，上网搜索了一些信息，发现都是低版本的SpringCloud的解决方案。Finchley版本和Greenwich版本并不适用。低版本的SpringCloud是基于springboot1 的版本，可以通过以下方式配置：1、引入spring-cloud-starter-zuul2、引入spring-boot-starter-actuator3、properties文件设置management.security.enabled=false4、访问/routes显示端点信息，访问/routes?format=details显示详细的端点信息SpringCloud高版本由于Finchley版本和Greenwich版本的Spring Cloud采用pringBoot2.0，security的操作有改动，导致management.security.enabled=false会报错：Deprecated:A global security auto-configuration is now provided…”而且zuul的代码全部放到了Netflix包下，访问/routes的方式也有所变化，具体的操作步骤如下：1、引入spring-cloud-starter-netflix-zuul2、引入spring-boot-starter-actuator3、properties文件设置management.endpoints.web.exposure.include=*4、访问/actuator/routes显示端点信息，访问/actuator/routes/details显示详细的端点信息]]></content>
+    <content type="text"><![CDATA[前言最近在研究SpringCloud Zuul的时候，发现通过 /routes无法查看路由信息，上网搜索了一些信息，发现都是低版本的SpringCloud的解决方案。Finchley版本和Greenwich版本并不适用。低版本的SpringCloud是基于springboot1 的版本，可以通过以下方式配置：1、引入spring-cloud-starter-zuul2、引入spring-boot-starter-actuator3、properties文件设置management.security.enabled=false4、访问/routes显示端点信息，访问/routes?format=details显示详细的端点信息SpringCloud高版本由于Finchley版本和Greenwich版本的Spring Cloud采用SpringBoot2.0，security的操作有改动，导致management.security.enabled=false会报错：Deprecated:A global security auto-configuration is now provided…”而且zuul的代码全部放到了Netflix包下，访问/routes的方式也有所变化，具体的操作步骤如下：1、引入spring-cloud-starter-netflix-zuul2、引入spring-boot-starter-actuator3、properties文件设置management.endpoints.web.exposure.include=*4、访问/actuator/routes显示端点信息，访问/actuator/routes/details显示详细的端点信息]]></content>
       <categories>
         <category>微服务</category>
       </categories>
