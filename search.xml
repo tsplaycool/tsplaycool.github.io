@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[使用SpringCloud Zuul过程中遇到的问题]]></title>
+    <url>%2F2019%2F04%2F14%2Fzuul%2F</url>
+    <content type="text"><![CDATA[背景使用SpringCloud Zuul开发一个可后台配置的网关系统，用户将转发规则写入数据库，Zuul网关启动的时候去数据库加载路由规则，进行请求转发。Zuul对接的后台服务不涉及服务注册与发现组件，从API接口捞取后台服务列表和地址，网关只需要根据规则将请求指向后台其中一台即可。采用Zuul该搭建该系统的原因在于，Zuul的转发原理可以让我们很方便的对请求的内容就行包装和处理。而基于Nginx做开发成本太高，涉及的编程语言门槛和其他一些因素。该网关系统采用@EnableZuulServer进行注解，无须涉及RibbonRoutingFilter。转发过程实际只需要根据规则将请求指向后台特定IP机器即可，因此该系统的route过滤器与SimpleHostRoutingFilter非常类似，完全可以基于SimpleHostRoutingFilter的源码做订制开发，从而来满足我们这个需求。请求URL编码问题通过网关发起的Get请求，到后台服务器时，上送的参数会被强制执行URLEncode。在SimpleHostRoutingFilter过滤器中，有一个参数forceOriginalQueryStringEncoding，顾名思义，强制采用原始请求的编码格式，即不对Get请求参数做编解码。SimpleHostRoutingFilter过滤器中构造HttpRequest的方法如下，构建HttpRequest12345678protected HttpRequest buildHttpRequest(String verb, String uri, InputStreamEntity entity, MultiValueMap&lt;String, String&gt; headers, MultiValueMap&lt;String, String&gt; params, HttpServletRequest request) &#123; HttpRequest httpRequest; String uriWithQueryString = uri + (this.forceOriginalQueryStringEncoding ? getEncodedQueryString(request) : this.helper.getQueryString(params)); ...&#125;该方法在构建url的时候，会根据forceOriginalQueryStringEncoding这个值执行不同的操作，当为true的时候，调用getEncodedQueryString方法，如下图所示，获取QueryString12345private String getEncodedQueryString(HttpServletRequest request) &#123; String query = request.getQueryString(); return (query != null) ? "?" + query : ""; &#125;&#125;可以看到，getEncodedQueryString方法直接返回request.QueryString，将不会对请求参数进行编解码操作。而this.helper.getQueryString方法会对请求参数做编解码处理。因此，只需要将forceOriginalQueryStringEncoding设置为true即可。该参数可以在Zuul的properties属性中配置，该参数在构造SimpleHostRoutingFilter中初始化的时候，是通过调用properties.isForceOriginalQueryStringEncoding()方法来进行初始化的。302重定向问题FormBodyWrapperFilterX-Forward-For与Host]]></content>
+      <categories>
+        <category>zuul</category>
+      </categories>
+      <tags>
+        <tag>SpringCloud</tag>
+        <tag>zuul</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[【学习笔记】用户态与内核态]]></title>
     <url>%2F2019%2F02%2F25%2Fuserandkernal%2F</url>
     <content type="text"><![CDATA[前言最近在学习Netty，学习五种IO模型，其中涉及一些时间片轮转，上下文切换的东西，自14年考完研后，这些东西都忘光了。百度搜索了一些关于用户态与内核态的知识，特记录一下以防遗忘。]]></content>
@@ -44,8 +56,8 @@
         <category>微服务</category>
       </categories>
       <tags>
-        <tag>微服务</tag>
         <tag>SpringCloud</tag>
+        <tag>微服务</tag>
       </tags>
   </entry>
   <entry>

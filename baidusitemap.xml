@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://www.tanrd.com/2019/04/14/zuul/</loc>
+    <lastmod>2019-04-14T12:22:20.619Z</lastmod>
+  </url>  <url>
     <loc>https://www.tanrd.com/2019/01/16/zuul/</loc>
     <lastmod>2019-04-05T14:32:09.486Z</lastmod>
   </url>  <url>
@@ -31,10 +34,10 @@
     <loc>https://www.tanrd.com/2018/11/28/springboot/</loc>
     <lastmod>2018-11-29T09:46:41.000Z</lastmod>
   </url>  <url>
-    <loc>https://www.tanrd.com/2018/11/28/hexogitmenterror/</loc>
+    <loc>https://www.tanrd.com/2018/11/28/xxnet/</loc>
     <lastmod>2018-11-29T03:39:34.000Z</lastmod>
   </url>  <url>
-    <loc>https://www.tanrd.com/2018/11/28/xxnet/</loc>
+    <loc>https://www.tanrd.com/2018/11/28/hexogitmenterror/</loc>
     <lastmod>2018-11-29T03:39:34.000Z</lastmod>
   </url>  <url>
     <loc>https://www.tanrd.com/2018/11/19/clouddev/</loc>
