@@ -1,9 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[DevOps部署bat脚本获取git SubModule的Commit-id]]></title>
+    <url>%2F2019%2F05%2F31%2Fdevops%2F</url>
+    <content type="text"><![CDATA[前言git]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>devops</tag>
+        <tag>bat</tag>
+        <tag>git</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[API网关性能优化之PoolingHttpClientConnectionManager]]></title>
+    <url>%2F2019%2F05%2F20%2Fhttpclient%2F</url>
+    <content type="text"></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>网关</tag>
+        <tag>学习笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[实体类使用包装类型]]></title>
+    <url>%2F2019%2F05%2F08%2Fnull%2F</url>
+    <content type="text"></content>
+      <categories>
+        <category>博客</category>
+      </categories>
+      <tags>
+        <tag>hexo</tag>
+        <tag>seo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[SpringBoot生产Https证书问题]]></title>
+    <url>%2F2019%2F05%2F08%2Fnull%2F</url>
+    <content type="text"></content>
+      <categories>
+        <category>博客</category>
+      </categories>
+      <tags>
+        <tag>hexo</tag>
+        <tag>seo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[SpringBoot配置Redis集群]]></title>
+    <url>%2F2019%2F05%2F06%2Fnull%2F</url>
+    <content type="text"><![CDATA[背景SpringBoot项目需要连接Redis集群，在网上查询了相关资料，很多都是连接一台localhost机器，或者采用Jedis进行操作。经过了解发现只需要]]></content>
+      <categories>
+        <category>博客</category>
+      </categories>
+      <tags>
+        <tag>hexo</tag>
+        <tag>seo</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[前端Ajax跨域带cookie问题]]></title>
+    <url>%2F2019%2F04%2F26%2Fcookie%2F</url>
+    <content type="text"><![CDATA[背景项目需要用到SSO进行登录权限控制，项目G采用完全前后端分离的系统架构。项目G包括两个系统：前端系统A，域名A.ssss.com；后端系统B，域名B.ssss.com。前端和后端都通过Docker容器进行部署，前后端都具有多个Pod节点，每个Pod通过session黏连进行路由，也就是说根据上送的Cookie中的某个字段进行负载路由到容器节点。用户在SSO系统进行登录，登录成功后SSO系统会给项目G传入token，项目G对该token进行解密，得到用户id和用户姓名等信息，项目G还需要对登录态进行维护。问题项目主要存在以下几个问题：1、SSO系统回调系统A的地址还是系统B。2、不同域名，带cookie问题。3、前端Ajax请求后端API的鉴权问题。方案情形一、假如系统A和系统B部署在同一个域名下，鉴权流程如下所示：1、]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>跨域</tag>
+        <tag>前端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[后端API工程架构模块划分]]></title>
+    <url>%2F2019%2F04%2F25%2Fspringboot%2F</url>
+    <content type="text"><![CDATA[前言最近在做前后端分离的项目，在使用SpringBoot开发后端API系统的时候，要考虑系统的可维护和可扩展性以及充分解耦。模块可以分为API、Server、Service、Dao、Common 这五个moduleAPI模块：定义Http请求的接口，入参和出参的DTO数据模型。Server模块：实现Http请求的控制器，实现API模块定义的接口。Service模块：真正实现控制器中的业务逻辑，给控制器解耦，易于测试。Dao模块：采用JPA等框架实现ORM映射，PO持久层的数据模型定义。Common模块：放置一些通用类，比如工具类、AOP切面、过滤器等。]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>api</tag>
+        <tag>后端</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[Servlet和Controller分析]]></title>
+    <url>%2F2019%2F04%2F25%2Fservlet%2F</url>
+    <content type="text"><![CDATA[笔记在最初的JAVA Web编程的时候，可以编写多个Servlet来处理不同的请求映射，这种方式可以配置多个Servlet来响应请求。当引入了SpringMvc之后采用一个Servlet来处理全部的请求，通过dispatchServlet类，将不同路径的请求调用不同的Controller来执行。在SpringBoot阶段，只是简化了Spring的配置，原理相同。]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>servlet</tag>
+        <tag>SpringBoot</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[SpringBoot无法访问静态资源的问题]]></title>
+    <url>%2F2019%2F04%2F23%2Fspringboot%2F</url>
+    <content type="text"><![CDATA[原因在开发过程中，为了使请求路径大小写不敏感，编写了一个配置类，继承了WebMVCConfigurationSupport，导致有@EnableWebMvc注解，该注解将导致静态资源无法访问，需要手动设置静态资源路径。]]></content>
+      <categories>
+        <category>springboot</category>
+      </categories>
+      <tags>
+        <tag>springboot</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[使用SpringCloud Zuul过程中遇到的问题]]></title>
     <url>%2F2019%2F04%2F14%2Fzuul%2F</url>
-    <content type="text"><![CDATA[背景使用SpringCloud Zuul开发一个可后台配置的网关系统，用户将转发规则写入数据库，Zuul网关启动的时候去数据库加载路由规则，进行请求转发。Zuul对接的后台服务不涉及服务注册与发现组件，从API接口捞取后台服务列表和地址，网关只需要根据规则将请求指向后台其中一台即可。采用Zuul该搭建该系统的原因在于，Zuul的转发原理可以让我们很方便的对请求的内容就行包装和处理。而基于Nginx做开发成本太高，涉及的编程语言门槛和其他一些因素。该网关系统采用@EnableZuulServer进行注解，无须涉及RibbonRoutingFilter。转发过程实际只需要根据规则将请求指向后台特定IP机器即可，因此该系统的route过滤器与SimpleHostRoutingFilter非常类似，完全可以基于SimpleHostRoutingFilter的源码做订制开发，从而来满足我们这个需求。请求URL编码问题通过网关发起的Get请求，到后台服务器时，上送的参数会被强制执行URLEncode。在SimpleHostRoutingFilter过滤器中，有一个参数forceOriginalQueryStringEncoding，顾名思义，强制采用原始请求的编码格式，即不对Get请求参数做编解码。SimpleHostRoutingFilter过滤器中构造HttpRequest的方法如下，构建HttpRequest12345678protected HttpRequest buildHttpRequest(String verb, String uri, InputStreamEntity entity, MultiValueMap&lt;String, String&gt; headers, MultiValueMap&lt;String, String&gt; params, HttpServletRequest request) &#123; HttpRequest httpRequest; String uriWithQueryString = uri + (this.forceOriginalQueryStringEncoding ? getEncodedQueryString(request) : this.helper.getQueryString(params)); ...&#125;该方法在构建url的时候，会根据forceOriginalQueryStringEncoding这个值执行不同的操作，当为true的时候，调用getEncodedQueryString方法，如下图所示，获取QueryString12345private String getEncodedQueryString(HttpServletRequest request) &#123; String query = request.getQueryString(); return (query != null) ? "?" + query : ""; &#125;&#125;可以看到，getEncodedQueryString方法直接返回request.QueryString，将不会对请求参数进行编解码操作。而this.helper.getQueryString方法会对请求参数做编解码处理。因此，只需要将forceOriginalQueryStringEncoding设置为true即可。该参数可以在Zuul的properties属性中配置，该参数在构造SimpleHostRoutingFilter中初始化的时候，是通过调用properties.isForceOriginalQueryStringEncoding()方法来进行初始化的。302重定向问题FormBodyWrapperFilterX-Forward-For与Host]]></content>
+    <content type="text"><![CDATA[背景使用SpringCloud Zuul开发一个可后台配置的网关系统，用户将转发规则写入数据库，Zuul网关启动的时候去数据库加载路由规则，进行请求转发。Zuul对接的后台服务不涉及服务注册与发现组件，从API接口捞取后台服务列表和地址，网关只需要根据规则将请求指向后台其中一台即可。采用Zuul该搭建该系统的原因在于，Zuul的转发原理可以让我们很方便的对请求的内容就行包装和处理。而基于Nginx做开发成本太高，涉及的编程语言门槛和其他一些因素。该网关系统采用@EnableZuulServer进行注解，无须涉及RibbonRoutingFilter。转发过程实际只需要根据规则将请求指向后台特定IP机器即可，因此该系统的route过滤器与SimpleHostRoutingFilter非常类似，完全可以基于SimpleHostRoutingFilter的源码做订制开发，从而来满足我们这个需求。请求URL编码问题通过网关发起的Get请求，到后台服务器时，上送的参数会被强制执行URLEncode。在SimpleHostRoutingFilter过滤器中，有一个参数forceOriginalQueryStringEncoding，顾名思义，强制采用原始请求的编码格式，即不对Get请求参数做编解码。SimpleHostRoutingFilter过滤器中构造HttpRequest的方法如下，构建HttpRequest12345678protected HttpRequest buildHttpRequest(String verb, String uri, InputStreamEntity entity, MultiValueMap&lt;String, String&gt; headers, MultiValueMap&lt;String, String&gt; params, HttpServletRequest request) &#123; HttpRequest httpRequest; String uriWithQueryString = uri + (this.forceOriginalQueryStringEncoding ? getEncodedQueryString(request) : this.helper.getQueryString(params)); ...&#125;该方法在构建url的时候，会根据forceOriginalQueryStringEncoding这个值执行不同的操作，当为true的时候，调用getEncodedQueryString方法，如下图所示，获取QueryString12345private String getEncodedQueryString(HttpServletRequest request) &#123; String query = request.getQueryString(); return (query != null) ? "?" + query : ""; &#125;&#125;可以看到，getEncodedQueryString方法直接返回request.QueryString，将不会对请求参数进行编解码操作。而this.helper.getQueryString方法会对请求参数做编解码处理。因此，只需要将forceOriginalQueryStringEncoding设置为true即可。该参数可以在Zuul的properties属性中配置，该参数在构造SimpleHostRoutingFilter中初始化的时候，是通过调用properties.isForceOriginalQueryStringEncoding()方法来进行初始化的。302重定向问题使用HttpClient进行通讯的过程中，如果遇到302、301这一类的重定向，HttpClient会自动发起二次请求，而这个时候的请求源IP则变成了网关地址，会造成IP漂移需要重新登录，因此需要将HttpClient的自动重定向禁用。将HttpClient的初始化改成HttpClientBuilder.create().disableRedirectHandling().build();增加一个disableRedirectHandling方法即可。请求Body编码问题这个问题源于Android客户端登陆时候遇到的，使用IPhone客户端登陆成功，但是Android客户端登陆失败。通过跟踪发现，Android客户端通过Post请求上送数据的时候，ContentType为application/x-www-form-urlencoded，而body中的数据为JSON格式。网关在处理的时候，经过FormBodyWrapperFilter会对数据进行编码，将body中的JSON格式编码转换，因此后台服务收到的数据是不正确的。IPhone之所以能登陆成功，是因为ContentType传的是application/json，FormBodyWrapperFilter的ShouldFilter方法会自动跳过这种情况。为了兼容已经在生产的客户端版本，网关采用禁用该过滤器的方式来解决该问题。通过在application.properites文件中增加zuul.FormBodyWrapperFilter.pre.disable=true配置。X-Forward-For与Host采用@EnableZuulServer和@EnableZuulProxy的一个区别就是，当使用@EnableZuulProxy作为注解的时候，会执行PreDecorationFilter过滤器，在该过滤器中会对请求头部做一些处理，比如带上以下参数：FilterConstants.java1234567891011121314151617181920/** * X-Forwarded-For Header */public static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";/** * X-Forwarded-Host Header */public static final String X_FORWARDED_HOST_HEADER = "X-Forwarded-Host";/** * X-Forwarded-Prefix Header */public static final String X_FORWARDED_PREFIX_HEADER = "X-Forwarded-Prefix";/** * X-Forwarded-Port Header */public static final String X_FORWARDED_PORT_HEADER = "X-Forwarded-Port";/** * X-Forwarded-Proto Header */public static final String X_FORWARDED_PROTO_HEADER = "X-Forwarded-Proto";而在ZuulProperites类中可以看到，addProxyHeaders默认为true，addHostHeader默认为false。所以采用@EnableZuulProxy作为注解的时候，会带上Forwarded相关头部信息，不会带上Host头部信息。ZuulProperites.java123456789 /** * Flag to determine whether the proxy adds X-Forwarded-* headers. */private boolean addProxyHeaders = true;/** * Flag to determine whether the proxy forwards the Host header. */private boolean addHostHeader = false;而本网关高度订制化，采用@EnableZuulServer作为注解，因此需要手动对所需Forward相关参数和Host进行处理。IIS Request.Url 带端口号的问题由于网关后台对接了asp.net的IIS服务，使用了.net中的Request.Url.AbsoluteUri方法来取值，这个方法会自动拼接Host和端口。网关在测试环境中将会遇到问题，例如测试环境是网关地址99.6.140.1:808，而后台.net服务器地址是99.6.163.3:888。即使在网关中将Host设置为99.6.140.1:808，通过上述方法取得的值还是，99.6.163.3:808，自动拼接上了.net目的地址的端口。此问题目前还未找到解决方案，网关无法解决，只能通过.net后台服务进行修改。Transfer-Encoding:chunked 与 Content-LengthContent-Encoding:Gzip 自动解压httpclient disableContentCompress]]></content>
       <categories>
         <category>zuul</category>
       </categories>
@@ -32,8 +140,8 @@
         <category>微服务</category>
       </categories>
       <tags>
-        <tag>zuul</tag>
         <tag>微服务</tag>
+        <tag>zuul</tag>
       </tags>
   </entry>
   <entry>
@@ -56,8 +164,8 @@
         <category>微服务</category>
       </categories>
       <tags>
-        <tag>SpringCloud</tag>
         <tag>微服务</tag>
+        <tag>SpringCloud</tag>
       </tags>
   </entry>
   <entry>
@@ -103,8 +211,8 @@
         <category>学习笔记</category>
       </categories>
       <tags>
-        <tag>SpringBoot</tag>
         <tag>学习笔记</tag>
+        <tag>SpringBoot</tag>
       </tags>
   </entry>
   <entry>
