@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[AWS亚马逊云VPS操作]]></title>
+    <url>%2F2019%2F11%2F16%2Fnull%2F</url>
+    <content type="text"><![CDATA[美国区AppStore账号下载SS客户端账号：tangyuan9102@gmail.com密码：POIU1234abcdMAC终端连接AWS EC212chmod 400 wpstan.pemssh -i "wpstan.pem" ubuntu@ec2-18-162-148-176.ap-east-1.compute.amazonaws.com安装ShadowSocks服务端12345678910111213141516171819202122232425sudo apt-get updatesudo apt-get install python-pipsudo pip install shadowsockssudo vim /etc/shadowsocks.json&#123; "server":"0.0.0.0", "local_address":"127.0.0.1", "local_port":1080, "port_password":&#123; "9000":"password0",//端口和密码 "9001":"password1", "9002":"password2", "9003":"password3", "9004":"password4" &#125;, "timeout":300, "method":"aes-256-cfb", "fast_open": false&#125;sudo ufw allow 9000 //开启端口sudo ufw allow 9001 //开启端口...sudo ssserver -c /etc/shadowsocks.json -d start//开启服务/bin/ps axu | grep ssserver | grep -v grep//检查服务启动状态ssserver -c /etc/shadowsocks.json -d stop//关闭服务安装Google BBR拥塞控制123sudo wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.shsudo chmod +x bbr.shsudo ./bbr.sh]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>AWS</tag>
+        <tag>vps</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[SpringBoot应用启停脚本]]></title>
     <url>%2F2019%2F05%2F31%2Fnull%2F</url>
     <content type="text"></content>
@@ -50,15 +62,15 @@
       </tags>
   </entry>
   <entry>
-    <title><![CDATA[SpringBoot生产Https证书问题]]></title>
-    <url>%2F2019%2F05%2F08%2Fnull%2F</url>
-    <content type="text"></content>
+    <title><![CDATA[SpringBoot生产环境配置SSL证书问题]]></title>
+    <url>%2F2019%2F05%2F08%2Fhttps%2F</url>
+    <content type="text"><![CDATA[前言SpringBoot应用通过https协议访问，需要配置SSL证书，证书格式需要采用JKS。在application.properties增加以下几个配置：–server.ssl.key-store-type=JKS–server.ssl.key-store=.jks–server.ssl.key-password=在测试环境，一般是自行生成一个证书进行测试，但是部署到生产环境后会报以下异常：此网站无法提供安全连接，**用了不受支持的协议。 ERR_SSL_VERSION_OR_CIPHER_MISTACH。协议不受支持，客户端和服务器不支持一般SSL协议版本或加密套件。]]></content>
       <categories>
-        <category>博客</category>
+        <category>SpringBoot</category>
       </categories>
       <tags>
-        <tag>hexo</tag>
-        <tag>seo</tag>
+        <tag>SpringBoot</tag>
+        <tag>https</tag>
       </tags>
   </entry>
   <entry>
