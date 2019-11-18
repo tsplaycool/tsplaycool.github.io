@@ -3,7 +3,7 @@
   <entry>
     <title><![CDATA[AWS亚马逊云VPS操作]]></title>
     <url>%2F2019%2F11%2F16%2Fawsvps%2F</url>
-    <content type="text"><![CDATA[美国区AppStore账号下载SS客户端账号：tangyuan9102@gmail.com密码：POIU1234abcdMAC终端连接AWS EC212chmod 400 wpstan.pemssh -i "wpstan.pem" ubuntu@ec2-18-162-148-176.ap-east-1.compute.amazonaws.com安装ShadowSocks服务端12345678910111213141516171819202122232425sudo apt-get updatesudo apt-get install python-pipsudo pip install shadowsockssudo vim /etc/shadowsocks.json&#123; "server":"0.0.0.0", "local_address":"127.0.0.1", "local_port":1080, "port_password":&#123; "9000":"password0",//端口和密码 "9001":"password1", "9002":"password2", "9003":"password3", "9004":"password4" &#125;, "timeout":300, "method":"aes-256-cfb", "fast_open": false&#125;sudo ufw allow 9000 //开启端口sudo ufw allow 9001 //开启端口...sudo ssserver -c /etc/shadowsocks.json -d start//开启服务/bin/ps axu | grep ssserver | grep -v grep//检查服务启动状态ssserver -c /etc/shadowsocks.json -d stop//关闭服务安装Google BBR拥塞控制123sudo wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.shsudo chmod +x bbr.shsudo ./bbr.sh]]></content>
+    <content type="text"><![CDATA[美国区AppStore账号下载SS客户端账号：tangyuan9102@gmail.com密码：POIU1234abcdMAC终端连接AWS EC212chmod 400 wpstan.pemssh -i "wpstan.pem" ubuntu@ec2-18-162-148-176.ap-east-1.compute.amazonaws.com安装ShadowSocks服务端12345678910111213141516171819202122232425sudo apt-get updatesudo apt-get install python-pipsudo pip install shadowsockssudo vim /etc/shadowsocks.json&#123; "server":"0.0.0.0", "local_address":"127.0.0.1", "local_port":1080, "port_password":&#123; "9000":"password0",//端口和密码 "9001":"password1", "9002":"password2", "9003":"password3", "9004":"password4" &#125;, "timeout":300, "method":"aes-256-cfb", "fast_open": false&#125;sudo ufw allow 9000 //开启端口sudo ufw allow 9001 //开启端口...sudo ssserver -c /etc/shadowsocks.json -d start//开启服务/bin/ps axu | grep ssserver | grep -v grep//检查服务启动状态sudo ssserver -c /etc/shadowsocks.json -d stop//关闭服务安装Google BBR拥塞控制123sudo wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.shsudo chmod +x bbr.shsudo ./bbr.sh]]></content>
       <categories>
         <category>学习笔记</category>
       </categories>
@@ -26,7 +26,7 @@
   <entry>
     <title><![CDATA[DevOps流水线中bat编译脚本获取git仓库版本信息]]></title>
     <url>%2F2019%2F05%2F31%2Fdevops%2F</url>
-    <content type="text"><![CDATA[背景DevOps流水线可以发布web应用A和B，其中A和B在编译时候依赖于C模块，A、B、C存储在不同的git仓库，C作为SubModule添加到A和B仓库中。]]></content>
+    <content type="text"><![CDATA[背景DevOps流水线可以发布web应用A和B，其中A和B在编译时候依赖于C模块，A、B、C存储在不同的git仓库，C作为SubModule添加到A和B仓库中。需要查询A和B应用使用到的C仓库的代码版本，在流水线构建的时候执行git命令拉取C的commit-id即可。代码12345678910111213141516171819202122232425262728@echo offsetlocal enabledelayedexpansion //变量延迟执行set dstDir=%1 //将版本信息写入的目标文件夹set baseDir=%2 //在该目录执行git命令获取版本号（也就是上文所述C仓库目录）if &quot;%dstDir%&quot; neq &quot;&quot; &#123; cd %baseDir% if exist temp.ini del temp.ini git rev-parse HEAD&gt;&gt;temp.ini set /p commitId=&lt;temp.ini del temp.ini (git log --pretty=format:%%cd !commitId! -1 --date==format:&quot;%%Y-%%m--%%d %%H:%%M:%%S&quot;)&gt;&gt;temp.ini set /p commitTime=&lt;temp.ini del temp.ini rem 获取当前编译时间 2019-11-11 11：11：11 set compileTime=%date:~0,4%-%date:~5,2%-%date:~8,2% %time:~0,2%:%time:~3,2%:%time:~6,2% cd %dstDir% rem 将数据输出到文件dst.ini中 if exist dst.ini del dst.ini echo CommitId=!commitId!&gt;&gt;dst.ini echo CommitTime=!commitTime!&gt;&gt;dst.ini echo CompileTime=!compileTime!&gt;&gt;dst.ini&#125;]]></content>
       <categories>
         <category>学习笔记</category>
       </categories>
