@@ -1,9 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[DocFx生成Asp.NetCore文档]]></title>
+    <url>%2F2019%2F11%2F25%2Fdocfx%2F</url>
+    <content type="text"><![CDATA[前言在看微软官方文档的时候，提到”To build the API Browser, we used open standards and tools. At its core, we leveraged DocFX - the open documentation generation toolchain, along with Xamarin’s mdoc application.”微软的.Net文档是通过DocFx来生成，通过该工具，可以在本地内网容器环境搭建Asp.Net Core的文档。DocFx1、下载DocFx（github releases），windows系统设置环境变量2、执行命令，生成一个初始化的dockfx项目1docfx init -q3、将Asp.Net Core源码中的src拷贝到上述生成的项目的src目录中4、执行命令，构建API文档。docfx.json可以设置默认的icon、logo等信息。1docfx docfx_project\docfx.json --serve]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>API</tag>
+        <tag>文档</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title><![CDATA[同步IO和异步IO]]></title>
+    <url>%2F2019%2F11%2F22%2FIO%2F</url>
+    <content type="text"><![CDATA[同步IO线程遇到IO请求，首先通过系统调用使得CPU进入内核态执行指令，系统内核通过调用驱动程序进行硬件IO处理。要么通过CPU将硬件缓冲区的IO数据拷贝到内核区域，要么通过DMA直接将硬件缓冲区的IO数据拷贝到内存区域。这两种方式的区别在于是否需要CPU接入这个拷贝过程。但是这两种方式都是同步IO，因为线程都必须等待数据从硬件缓冲区拷贝到内存区域，才能进行下一步操作。在这种情况下进行高并发操作，必须依赖很多线程。而很多线程在等待内存中IO数据准备好的过程中，会因为中断导致CPU上下文切换而丢失CPU所有权，CPU转而执行其他就绪线程，上下文切换是比较消耗CPU资源的，在大多数X86或者X64架构的CPU中，线程上下文切换的时间间隔大约为15ms。异步IO在基于DMA的基础上，不需要CPU参与IO拷贝，那么就可以给CPU腾出空间执行其他逻辑。异步IO相比同步IO，工作线程可以执行其他请求，而不会阻塞等待IO请求执行完毕。可以极大提升系统性能，最大程度降低线程数量，减少线程上线文切换产生的性能损失。之所以能实现异步IO，在于当前线程向设备发出异步IO时候，请求被传给设备驱动程序，设备驱动程序处理IO请求时并不会等待IO请求完成，而是将IO请求加入到设备驱动程序的队列中，然后返回一个IO处理中的信号。应用程序不需要挂起等待IO请求的完成，从而可以继续执行其他任务。总结1、同步IO会阻塞线程，该模式下提高并发性能必须增加很多线程，但是很多线程会因为上下文切换而造成性能损失。2、异步IO实现高性能IO有三点：减少IO上下文切换；异步非阻塞线程；避免内存复制。3、开发高性能服务器框架的必备条件在于减少线程、避免内存复制、避免线程阻塞。]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>IO</tag>
+        <tag>同步</tag>
+        <tag>异步</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[AWS亚马逊云VPS操作]]></title>
     <url>%2F2019%2F11%2F16%2Fawsvps%2F</url>
-    <content type="text"><![CDATA[美国区AppStore账号下载SS客户端账号：tangyuan9102@gmail.com密码：POIU1234abcdMAC终端连接AWS EC212chmod 400 wpstan.pemssh -i "wpstan.pem" ubuntu@ec2-18-162-148-176.ap-east-1.compute.amazonaws.com安装ShadowSocks服务端12345678910111213141516171819202122232425sudo apt-get updatesudo apt-get install python-pipsudo pip install shadowsockssudo vim /etc/shadowsocks.json&#123; "server":"0.0.0.0", "local_address":"127.0.0.1", "local_port":1080, "port_password":&#123; "9000":"password0",//端口和密码 "9001":"password1", "9002":"password2", "9003":"password3", "9004":"password4" &#125;, "timeout":300, "method":"aes-256-cfb", "fast_open": false&#125;sudo ufw allow 9000 //开启端口sudo ufw allow 9001 //开启端口...sudo ssserver -c /etc/shadowsocks.json -d start//开启服务/bin/ps axu | grep ssserver | grep -v grep//检查服务启动状态sudo ssserver -c /etc/shadowsocks.json -d stop//关闭服务安装Google BBR拥塞控制123sudo wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.shsudo chmod +x bbr.shsudo ./bbr.sh]]></content>
+    <content type="text"><![CDATA[美国区AppStore账号下载SS客户端账号：tangyuan9102@gmail.com密码：POIU1234abcdMAC终端连接AWS EC212chmod 400 wpstan.pemssh -i "wpstan.pem" ubuntu@ec2-18-162-148-176.ap-east-1.compute.amazonaws.com安装ShadowSocks服务端12345678910111213141516171819202122232425sudo apt-get updatesudo apt-get install python-pipsudo pip install shadowsockssudo vim /etc/shadowsocks.json&#123; "server":"0.0.0.0", "local_address":"127.0.0.1", "local_port":1080, "port_password":&#123; "9000":"password0",//端口和密码 "9001":"password1", "9002":"password2", "9003":"password3", "9004":"password4" &#125;, "timeout":300, "method":"aes-256-cfb", "fast_open": false&#125;sudo ufw allow 9000 //开启端口sudo ufw allow 9001 //开启端口...sudo ssserver -c /etc/shadowsocks.json -d start//开启服务/bin/ps axu | grep ssserver | grep -v grep//检查服务启动状态sudo ssserver -c /etc/shadowsocks.json -d stop//关闭服务安装Google BBR拥塞控制123sudo wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.shsudo chmod +x bbr.shsudo ./bbr.shshadowsocks-libev使用ss-server命令替换原有ssserver，性能比shadowsocks好。相比原版Shadowsocks，libev(c#)版本提供了更多的特性支持；而关于ShadowsocksR(Python)，Shadowsocks-libev率先支持AEAD Cipher，并向ShadowsocksR学习引进了Obfs(Simple-Obfs)，且提供稳定的周期性更新；长远来看，ShadowsocksR更倾向于向none加密化和Obfs化发展，而Shadowsocks-libev则倾向于向强化Cipher的方向发展，两者有不同的侧重点。简单来说，ShadowsocksR更侧重消除特征以更好穿过GFW，而Shadowsocks-libev则追求更高的安全性，综合起来并无优劣之分simple-obfs 和 v2ray-plugin不加插件，单独使用shadowsocks很容易被封，可以使用simple-obfs或者v2ray-plugin插件做混淆。simple-obfs已经不推荐，github上不再维护，可以使用v2ray-plugin。用于混淆 Shadowsocks 流量的工具，目的是让ss-local的流量更像正常的http流量，思路是在原来的 Shadowsocks 流量上叠加一层加密，使得 G和F谐W 无法判断是否正常的网站流量。v2ray-plugin使用https做加密，应该比simple-obfs强很多，但是需要自己申请域名和证书。]]></content>
       <categories>
         <category>学习笔记</category>
       </categories>
@@ -163,8 +188,8 @@
         <category>微服务</category>
       </categories>
       <tags>
-        <tag>微服务</tag>
         <tag>zuul</tag>
+        <tag>微服务</tag>
       </tags>
   </entry>
   <entry>
@@ -187,8 +212,8 @@
         <category>微服务</category>
       </categories>
       <tags>
-        <tag>微服务</tag>
         <tag>SpringCloud</tag>
+        <tag>微服务</tag>
       </tags>
   </entry>
   <entry>
