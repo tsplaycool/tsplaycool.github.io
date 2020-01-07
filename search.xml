@@ -51,7 +51,7 @@
   <entry>
     <title><![CDATA[SpringBoot应用启停脚本]]></title>
     <url>%2F2019%2F08%2F31%2Fstartstopjar%2F</url>
-    <content type="text"><![CDATA[启动脚本123456nohup /usr/bin/java -jar Gateway.jar --spring.profiles.active=prd --server.ssl.key-store-type=JKS --server.port=443 --server.ssl.key-store=***.jks(jks类型秘钥) --server.ssl.key-password=***(密码)--server.ssl.ciphers=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_RSA_WITH_RC4_128_SHA,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA256,TLS_RSA_WITH_AES_256_CBC_SHA_,SSL_RSA_WITH_RC4_128_SHA &amp;停止脚本1ps -ef|grep java |grep Gateway.jar |grep -v grep |awk '&#123;print $2' |xargs kill -9]]></content>
+    <content type="text"><![CDATA[启动脚本123456nohup /usr/bin/java -jar Gateway.jar --spring.profiles.active=prd --server.ssl.key-store-type=JKS --server.port=443 --server.ssl.key-store=***.jks(jks类型秘钥) --server.ssl.key-password=***(密码)--server.ssl.ciphers=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_RSA_WITH_RC4_128_SHA,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA256,TLS_RSA_WITH_AES_256_CBC_SHA_,SSL_RSA_WITH_RC4_128_SHA &amp;停止脚本1ps -ef|grep java |grep Gateway.jar |grep -v grep |awk '&#123;print $2&#125;' |xargs kill -9备注nohup 命令会默认在当前路径生成nohup.out日志，可以在末尾&amp;之前加上1nohup *** &gt;/dev/null 2&gt;&amp;1 &amp;]]></content>
       <categories>
         <category>学习笔记</category>
       </categories>
@@ -75,7 +75,7 @@
   <entry>
     <title><![CDATA[API网关性能优化之PoolingHttpClientConnectionManager]]></title>
     <url>%2F2019%2F05%2F20%2Fhttpclient%2F</url>
-    <content type="text"></content>
+    <content type="text"><![CDATA[笔记使用自定义zuul网关的时候，与后台主机通信采用HttpClient类，使用PoolingHttpClientConnectionManager作为HttpClient的链接管理对象，可以有效减少创建连接的资源开销，尤其是网关类应用，与后台主机通信的时候，长连接比较合适。HttpClient在与后台主机通讯时候，会启用本地的随机一个tcp端口与远程主机的tcp端口进行连接。PoolingHttpClientConnectionManager可以设置两个参数维护连接对应的每个后台主机连接池，以及全部连接池。setMaxPerRoute（默认值20）方法和setMaxTotal（默认值200）方法，前者设置请求同一个远程主机地址的本地tcp端口数量，后者则是HttpClient对象维护的整个tcp端口数量。例如，当setMaxPerRoute为2的时候，setMaxTotal为4的时候，并发请求3个相同的目的主机，httpclient首先启用两个本地tcp端口与远程主机通讯，当结果返回后，第三个请求才能执行。]]></content>
       <categories>
         <category>学习笔记</category>
       </categories>

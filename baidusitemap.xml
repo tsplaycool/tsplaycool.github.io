@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://www.tanrd.com/2019/08/31/startstopjar/</loc>
+    <lastmod>2020-01-07T12:13:22.191Z</lastmod>
+  </url>  <url>
+    <loc>https://www.tanrd.com/2019/05/20/httpclient/</loc>
+    <lastmod>2020-01-07T11:59:22.990Z</lastmod>
+  </url>  <url>
     <loc>https://www.tanrd.com/2019/12/11/responseSlow/</loc>
     <lastmod>2019-12-18T13:48:41.766Z</lastmod>
   </url>  <url>
@@ -19,17 +25,11 @@
     <loc>https://www.tanrd.com/2019/05/08/https/</loc>
     <lastmod>2019-11-16T09:02:47.390Z</lastmod>
   </url>  <url>
-    <loc>https://www.tanrd.com/2019/08/31/startstopjar/</loc>
-    <lastmod>2019-11-16T09:00:52.942Z</lastmod>
-  </url>  <url>
     <loc>https://www.tanrd.com/2018/11/28/springboot/</loc>
     <lastmod>2019-06-06T01:07:49.086Z</lastmod>
   </url>  <url>
     <loc>https://www.tanrd.com/2019/04/14/zuul/</loc>
     <lastmod>2019-05-31T02:47:11.044Z</lastmod>
-  </url>  <url>
-    <loc>https://www.tanrd.com/2019/05/20/httpclient/</loc>
-    <lastmod>2019-05-20T03:38:30.576Z</lastmod>
   </url>  <url>
     <loc>https://www.tanrd.com/2019/05/08/null/</loc>
     <lastmod>2019-05-08T13:24:07.444Z</lastmod>
