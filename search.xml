@@ -5,7 +5,7 @@
     <url>%2F2020%2F01%2F12%2F301_redirect%2F</url>
     <content type="text"><![CDATA[前言将博客部署到gitpage，访问速度是一个大问题，每次TTFB都是四五秒。因此，选用虚拟主机来部署静态html博客，加快博客访问速度，这个时候就会遇到一个SEO的问题。当我们在采用gitpage的时候，可以通过在根目录加一个CNAME文件，内容为www.tanrd.com ，github主机会自动将tanrd.com永久重定向到www.tanrd.com 。而在采用虚拟主机部署的时候，这个301重定向就需要自己来设置了。在阿里云设置域名解析的时候，既设置了根域名tanrd.com解析到主机，也设置了www.tanrd.com 解析到主机，然而搜索引擎收录的内容都是之前以www开头的域名。为了继续沿用一个域名作为SEO的主要域名，需要将不带www的域名解析到带www的域名。代码虚拟主机支持php解析，因此在hexo的_posts目录中增加一个index.php文件，同时在虚拟主机设置优先读取的首页为index.php。根据域名判断为tanrd.com的时候，在请求head中增加301重定向信息，当域名为www.tanrd.com 的时候，直接include返回hexo自动生成的index.html文件。&lt;?php $the_host = $_SERVER['HTTP_HOST']; $request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : ''; if($the_host == 'tanrd.com') { header('HTTP/1.1 301 Moved Permanently'); header('Location: http://www.tanrd.com'.$request_uri); }else{ //require('index.html'); require每次都首先加载，include执行到再加载 include('index.html'); } ?&gt;]]></content>
       <categories>
-        <category>学习笔记</category>
+        <category>博客</category>
       </categories>
       <tags>
         <tag>hexo</tag>
@@ -17,7 +17,7 @@
     <url>%2F2020%2F01%2F09%2FcustomZuulRibbon%2F</url>
     <content type="text"><![CDATA[前言脱离Eureka等服务注册与发现组件，使用Zuul和Ribbon来做网关负载均衡，可以在application.properties中配置listOfServer指定后台主机地址。然而这种方式存在一些弊端，强依赖配置文件，无法做到实时变更和维护。通过构建自定义的路由加载类、service-id等配置，可以实现从数据库或者其他地方加载路由规则。同时还可以实现自定义的ServerList、IRule、IPing等来维护网关的可扩展性。详细源码在github上源码地址，需要的老铁可以给个star。application.properties采用配置文件的路由规则配置通常采用如下方式。1234567891011121314#定义名为ironman的路由规则，负载均衡的主机使用ribbon的listOfServers配置#可以采用以下方式配置路由规则的IRule、IPing、ServerList等#&lt;clientName&gt;.ribbon.NFLoadBalancerClassName: Should implement ILoadBalancer#&lt;clientName&gt;.ribbon.NFLoadBalancerRuleClassName: Should implement IRule#&lt;clientName&gt;.ribbon.NFLoadBalancerPingClassName: Should implement IPing#&lt;clientName&gt;.ribbon.NIWSServerListClassName: Should implement ServerList#&lt;clientName&gt;.ribbon.NIWSServerListFilterClassName: Should implement ServerListFilterzuul.routes.ironman.path=/**zuul.routes.ironman.service-id=flyfly.ribbon.listOfServers=http://localhost:9000,http://localhost:9001fly.ribbon.NFLoadBalancerRuleClassName=com.wpstan.custom.ribbon.CustomRulefly.ribbon.NFLoadBalancerPingClassName=com.wpstan.custom.ribbon.CustomPingfly.ribbon.NIWSServerListClassName=com.wpstan.custom.ribbon.CustomServerListCustomZuulConfig.java自定义Zuul配置类，采用CustomRouteLocator类来加载路由规则。12345678910111213141516171819@Configurationpublic class CustomZuulConfig &#123; private final ZuulProperties zuulProperties; private final ServerProperties serverProperties; @Autowired public CustomZuulConfig(ZuulProperties zuulProperties,ServerProperties serverProperties)&#123; this.zuulProperties = zuulProperties; this.serverProperties = serverProperties; &#125; @Bean public CustomRouteLocator routeLocator()&#123; CustomRouteLocator routeLocator = new CustomRouteLocator(serverProperties.getServlet().getContextPath(), zuulProperties); return routeLocator; &#125;&#125;CustomRouteLocator.java自定义Zuul路由规则加载类，重写locateRoutes方法，首先从配置加载，再从其他地方加载。12345ZuulProperties.ZuulRoute zuulRoute = new ZuulProperties.ZuulRoute();zuulRoute.setId("ironman");zuulRoute.setServiceId("fly");zuulRoute.setPath("/**");routesMap.put(zuulRoute.getPath(), zuulRoute);CustomRibbonAutoConfiguration.java自定义Ribbon的配置类，用以指定RibbonClient采用CustomRibbonClientConfiguration类进行初始化。123@RibbonClients( defaultConfiguration = &#123;CustomRibbonClientConfiguration.class&#125;)CustomRibbonClientConfiguration.java自定义ribbon相关的配置类，可以在此类中构造IPing、IRule、ServerList等数据。可以从数据库配置中根据ribbon的service-id来构造不同的IPing、IRule、ServerList等实现类。当service-id没有构造的时候，会从此类中进行构造。1234567891011121314151617181920212223242526272829303132333435363738394041424344public class CustomRibbonClientConfiguration extends RibbonClientConfiguration &#123; @Bean @ConditionalOnMissingBean @Override public IClientConfig ribbonClientConfig() &#123; IClientConfig config = super.ribbonClientConfig(); //可以增加一些配置，例如Ping后台主机的时间间隔5s config.set(CommonClientConfigKey.NFLoadBalancerPingInterval, 5); //可以在此设置Ping实现类（无需重写ribbonPing，base中会根据如下配置反射构造IPing），也可以使用方法直接构造，例如下面的ribbonPing()方法 config.set(CommonClientConfigKey.NFLoadBalancerPingClassName,"com.wpstan.custom.ribbon.CustomPing"); //设置MaxAutoRetries为2，确保某个服务挂的瞬间，ServerStats的Successive Connection Failure大于或等于 //ServerStats中的connectionFailureThreshold的默认次数3。这样ServerStats的isCircuitBreakerTripped才被置位短路。 //在Retry重试的时候，CustomRule中Choose下一个服务的时候，确保之前的服务已经短路，选用下一个服务，否则可能继续选择不可用服务导致报错。 //还有一种方式就是调小ServerStats的connectionFailureThreshold。 config.set(CommonClientConfigKey.MaxAutoRetries, 2); return config; &#125; @Bean @ConditionalOnMissingBean @Override public ServerList&lt;Server&gt; ribbonServerList(IClientConfig config) &#123; CustomServerList serverList = new CustomServerList(); serverList.initWithNiwsConfig(config); return serverList; &#125; @Bean @ConditionalOnMissingBean @Override public IRule ribbonRule(IClientConfig config) &#123; CustomRule rule = new CustomRule(); rule.initWithNiwsConfig(config); return rule; &#125; @Bean @ConditionalOnMissingBean @Override public IPing ribbonPing(IClientConfig config) &#123; return new CustomPing(); &#125;&#125;CustomServerList.java自定义ServerList类，等价于重写listOfServer配置，通过getUpdatedListOfServers来维护service-id对应的后台主机服务。PollingServerListUpdater类定时任务更新时，会调用getUpdatedListOfServers方法。1234567891011121314151617181920212223public class CustomServerList implements ServerList&lt;Server&gt;, IClientConfigAware &#123; private IClientConfig clientConfig; @Override public List&lt;Server&gt; getInitialListOfServers() &#123; return getUpdatedListOfServers(); &#125; @Override public List&lt;Server&gt; getUpdatedListOfServers() &#123; List&lt;Server&gt; servers = new ArrayList&lt;&gt;(); Server server1 = new Server("http://localhost:9000"); Server server2 = new Server("http://localhost:9001"); servers.add(server1); servers.add(server2); return servers; &#125; @Override public void initWithNiwsConfig(IClientConfig iClientConfig) &#123; this.clientConfig = iClientConfig; &#125;&#125;CustomPing.java自定义IPing类，通过定时任务，维护后台机器活性，采用HttpClient与后台机器通信。12345678910111213141516171819202122232425262728293031323334353637@Override public boolean isAlive(Server server) &#123; String urlStr = ""; if (this.isSecure) &#123; urlStr = "https://"; &#125; else &#123; urlStr = "http://"; &#125; urlStr = urlStr + server.getId(); urlStr = urlStr + this.getPingAppendString(); boolean isAlive = false; HttpClient httpClient = HttpClientBuilder.create().build(); HttpUriRequest getRequest = new HttpGet(urlStr); String content = null; try &#123; HttpResponse response = httpClient.execute(getRequest); content = EntityUtils.toString(response.getEntity()); isAlive = response.getStatusLine().getStatusCode() == 200; if (this.getExpectedContent() != null) &#123; if (content == null) &#123; isAlive = false; &#125; else if (content.equals(this.getExpectedContent())) &#123; isAlive = true; &#125; else &#123; isAlive = false; &#125; &#125; &#125; catch (IOException var11) &#123; var11.printStackTrace(); &#125; finally &#123; getRequest.abort(); &#125; return isAlive; &#125;CustomRule.java自定义IRule类，RibbonRoutingFilter过滤器会根据请求的url地址，首先匹配service-id，然后根据service-id匹配的IRule实现类，从IRule中获取一个目的主机地址，当前CustomRule采用IP Hash算法，同时根据ServerStatus维护的主机状态获取目的主机。12345678910111213141516171819202122232425public Server choose(ILoadBalancer lb, Object key) &#123; //首先获取可用的后台主机，可用的后台主机会根据定时任务不断调用ServerList中的getUpdatedListOfServers()方法来维护 List&lt;Server&gt; upServerList = lb.getReachableServers(); RequestContext requestContext = RequestContext.getCurrentContext(); HttpServletRequest request = requestContext.getRequest(); //获取IP地址，根据IP地址做Hash String ip = request.getRemoteAddr(); int hashCode = Math.abs(ip.hashCode()); int num = hashCode % upServerList.size(); LoadBalancerStats loadBalancerStats = ((AbstractLoadBalancer) lb).getLoadBalancerStats(); //ServerStats类维护的是后台主机的状态 ServerStats serverStats = loadBalancerStats.getSingleServerStat(upServerList.get(num)); System.out.println("当前机器失败次数：" + serverStats.getServer().getId()+" "+serverStats.getSuccessiveConnectionFailureCount()); int count = 0; //轮训判断后台服务是否短路挂起 while (serverStats.isCircuitBreakerTripped()) &#123; if (++count &gt;= upServerList.size()) &#123; return null; &#125; num = (num + 1) % upServerList.size(); serverStats = loadBalancerStats.getSingleServerStat(upServerList.get(num)); &#125; System.out.println("#####:选择了" + serverStats.getServer().getId()); return upServerList.get(num); &#125;]]></content>
       <categories>
-        <category>Zuul</category>
+        <category>Java</category>
       </categories>
       <tags>
         <tag>zuul</tag>
@@ -29,7 +29,7 @@
     <url>%2F2019%2F12%2F11%2FresponseSlow%2F</url>
     <content type="text"><![CDATA[前言DMZ区的测试网关应用，部署在linux系统。有一天突然响应很慢，应用重启速度也很慢，但是访问部分url网速正常。通过排查发现是InetAddress.getLocalHost方法导致，该方法会通过内核指令获取本机host中配置内容，而host内容被运行自动化工具修改过。解决在hosts文件中增加：1127.0.0.1 machineName（主机名）]]></content>
       <categories>
-        <category>学习笔记</category>
+        <category>Java</category>
       </categories>
       <tags>
         <tag>SpringBoot</tag>
@@ -40,7 +40,7 @@
     <url>%2F2019%2F11%2F25%2Fdocfx%2F</url>
     <content type="text"><![CDATA[前言在看微软官方文档的时候，提到”To build the API Browser, we used open standards and tools. At its core, we leveraged DocFX - the open documentation generation toolchain, along with Xamarin’s mdoc application.”微软的.Net文档是通过DocFx来生成，通过该工具，可以在本地内网容器环境搭建Asp.Net Core的文档。DocFx1、下载DocFx（github releases），windows系统设置环境变量2、执行命令，生成一个初始化的dockfx项目1docfx init -q3、将本地nuget仓库中的Asp.Net Core源码源码dll和对应xml文件，拷贝到上述生成的项目的src目录中4、需要修改docfx.json为元数据目标文件为：src/**/*.dll。4、执行命令，构建API文档。docfx.json可以设置默认的icon、logo、模板等信息。1docfx docfx_project\docfx.json 备注1、直接将源码中的src拷贝到项目的src目录，通过docfx.json修改配置为”src/**/*.sln”进行构建会导致问题，问题：标签不能正确链接指向跨解决方案的类，可能是未经过nuget restore。2、为了避免上述问题，可以直接从nuget本地源中将Asp.Net Core的dll和dll对应的xml文件，拷贝到docfx项目的src中。3、修改docfx.json中的”metadata”配置，将”src”下的”files”改成”src/**/*.dll”即可。4、docfx.json中的template配置，默认是default，可以切换成statictoc，statictoc比default生成的文件大，因为每个生成的html文件都包含了toc搜索的内容，而default模板打包出来的是单独加载toc.html的文件，这就导致页面在切换的时候会出现闪动的情况。]]></content>
       <categories>
-        <category>学习笔记</category>
+        <category>NetCore</category>
       </categories>
       <tags>
         <tag>API</tag>
@@ -77,7 +77,7 @@
     <url>%2F2019%2F08%2F31%2Fstartstopjar%2F</url>
     <content type="text"><![CDATA[启动脚本123456nohup /usr/bin/java -jar Gateway.jar --spring.profiles.active=prd --server.ssl.key-store-type=JKS --server.port=443 --server.ssl.key-store=***.jks(jks类型秘钥) --server.ssl.key-password=***(密码)--server.ssl.ciphers=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_RSA_WITH_RC4_128_SHA,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA256,TLS_RSA_WITH_AES_256_CBC_SHA_,SSL_RSA_WITH_RC4_128_SHA &amp;停止脚本1ps -ef|grep java |grep Gateway.jar |grep -v grep |awk '&#123;print $2&#125;' |xargs kill -9备注nohup 命令会默认在当前路径生成nohup.out日志，可以在末尾&amp;之前加上1nohup *** &gt;/dev/null 2&gt;&amp;1 &amp;]]></content>
       <categories>
-        <category>SpringBoot</category>
+        <category>Java</category>
       </categories>
       <tags>
         <tag>学习笔记</tag>
@@ -88,7 +88,7 @@
     <url>%2F2019%2F05%2F31%2Fdevops%2F</url>
     <content type="text"><![CDATA[背景DevOps流水线可以发布web应用A和B，其中A和B在编译时候依赖于C模块，A、B、C存储在不同的git仓库，C作为SubModule添加到A和B仓库中。需要查询A和B应用使用到的C仓库的代码版本，在流水线构建的时候执行git命令拉取C的commit-id即可。代码12345678910111213141516171819202122232425262728@echo offsetlocal enabledelayedexpansion //变量延迟执行set dstDir=%1 //将版本信息写入的目标文件夹set baseDir=%2 //在该目录执行git命令获取版本号（也就是上文所述C仓库目录）if &quot;%dstDir%&quot; neq &quot;&quot; &#123; cd %baseDir% if exist temp.ini del temp.ini git rev-parse HEAD&gt;&gt;temp.ini set /p commitId=&lt;temp.ini del temp.ini (git log --pretty=format:%%cd !commitId! -1 --date==format:&quot;%%Y-%%m--%%d %%H:%%M:%%S&quot;)&gt;&gt;temp.ini set /p commitTime=&lt;temp.ini del temp.ini rem 获取当前编译时间 2019-11-11 11：11：11 set compileTime=%date:~0,4%-%date:~5,2%-%date:~8,2% %time:~0,2%:%time:~3,2%:%time:~6,2% cd %dstDir% rem 将数据输出到文件dst.ini中 if exist dst.ini del dst.ini echo CommitId=!commitId!&gt;&gt;dst.ini echo CommitTime=!commitTime!&gt;&gt;dst.ini echo CompileTime=!compileTime!&gt;&gt;dst.ini&#125;]]></content>
       <categories>
-        <category>学习笔记</category>
+        <category>Linux</category>
       </categories>
       <tags>
         <tag>devops</tag>
@@ -101,7 +101,7 @@
     <url>%2F2019%2F05%2F20%2Fhttpclient%2F</url>
     <content type="text"><![CDATA[笔记使用自定义zuul网关的时候，与后台主机通信采用HttpClient类，使用PoolingHttpClientConnectionManager作为HttpClient的链接管理对象，可以有效减少创建连接的资源开销，尤其是网关类应用，与后台主机通信的时候，长连接比较合适。HttpClient在与后台主机通讯时候，会启用本地的随机一个tcp端口与远程主机的tcp端口进行连接。PoolingHttpClientConnectionManager可以设置两个参数维护连接对应的每个后台主机连接池，以及全部连接池。setMaxPerRoute（默认值20）方法和setMaxTotal（默认值200）方法，前者设置请求同一个远程主机地址的本地tcp端口数量，后者则是HttpClient对象维护的整个tcp端口数量。例如，当setMaxPerRoute为2的时候，setMaxTotal为4的时候，并发请求3个相同的目的主机，httpclient首先启用两个本地tcp端口与远程主机通讯，当结果返回后，第三个请求才能执行。]]></content>
       <categories>
-        <category>学习笔记</category>
+        <category>Java</category>
       </categories>
       <tags>
         <tag>学习笔记</tag>
@@ -125,7 +125,7 @@
     <url>%2F2019%2F05%2F08%2Fhttps%2F</url>
     <content type="text"><![CDATA[前言SpringBoot应用通过https协议访问，需要配置SSL证书，证书格式需要采用JKS。在application.properties增加以下几个配置：–server.ssl.key-store-type=JKS–server.ssl.key-store=.jks–server.ssl.key-password=在测试环境，一般是自行生成一个证书进行测试，但是部署到生产环境后会报以下异常：此网站无法提供安全连接，**用了不受支持的协议。 ERR_SSL_VERSION_OR_CIPHER_MISTACH。协议不受支持，客户端和服务器不支持一般SSL协议版本或加密套件。解决方法增加配置server.ssl.ciphers.1234--server.ssl.ciphers=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256,TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA,TLS_ECDHE_RSA_WITH_RC4_128_SHA,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA,TLS_RSA_WITH_AES_256_CBC_SHA256,TLS_RSA_WITH_AES_256_CBC_SHA_,SSL_RSA_WITH_RC4_128_SHA]]></content>
       <categories>
-        <category>SpringBoot</category>
+        <category>Java</category>
       </categories>
       <tags>
         <tag>SpringBoot</tag>
@@ -137,7 +137,7 @@
     <url>%2F2019%2F05%2F06%2Fnull%2F</url>
     <content type="text"><![CDATA[背景SpringBoot项目需要连接Redis集群，在网上查询了相关资料，很多都是连接一台localhost机器，或者采用Jedis进行操作。经过了解发现只需要]]></content>
       <categories>
-        <category>SpringBoot</category>
+        <category>Java</category>
       </categories>
       <tags>
         <tag>hexo</tag>
@@ -185,7 +185,7 @@
     <url>%2F2019%2F04%2F23%2Fspringboot%2F</url>
     <content type="text"><![CDATA[原因在开发过程中，为了使请求路径大小写不敏感，编写了一个配置类，继承了WebMVCConfigurationSupport，导致有@EnableWebMvc注解，该注解将导致静态资源无法访问，需要手动设置静态资源路径。]]></content>
       <categories>
-        <category>SpringBoot</category>
+        <category>Java</category>
       </categories>
       <tags>
         <tag>SpringBoot</tag>
@@ -196,7 +196,7 @@
     <url>%2F2019%2F04%2F14%2Fzuul%2F</url>
     <content type="text"><![CDATA[背景使用SpringCloud Zuul开发一个可后台配置的网关系统，用户将转发规则写入数据库，Zuul网关启动的时候去数据库加载路由规则，进行请求转发。Zuul对接的后台服务不涉及服务注册与发现组件，从API接口捞取后台服务列表和地址，网关只需要根据规则将请求指向后台其中一台即可。采用Zuul该搭建该系统的原因在于，Zuul的转发原理可以让我们很方便的对请求的内容就行包装和处理。而基于Nginx做开发成本太高，涉及的编程语言门槛和其他一些因素。该网关系统采用@EnableZuulServer进行注解，无须涉及RibbonRoutingFilter。转发过程实际只需要根据规则将请求指向后台特定IP机器即可，因此该系统的route过滤器与SimpleHostRoutingFilter非常类似，完全可以基于SimpleHostRoutingFilter的源码做订制开发，从而来满足我们这个需求。请求URL编码问题通过网关发起的Get请求，到后台服务器时，上送的参数会被强制执行URLEncode。在SimpleHostRoutingFilter过滤器中，有一个参数forceOriginalQueryStringEncoding，顾名思义，强制采用原始请求的编码格式，即不对Get请求参数做编解码。SimpleHostRoutingFilter过滤器中构造HttpRequest的方法如下，构建HttpRequest12345678protected HttpRequest buildHttpRequest(String verb, String uri, InputStreamEntity entity, MultiValueMap&lt;String, String&gt; headers, MultiValueMap&lt;String, String&gt; params, HttpServletRequest request) &#123; HttpRequest httpRequest; String uriWithQueryString = uri + (this.forceOriginalQueryStringEncoding ? getEncodedQueryString(request) : this.helper.getQueryString(params)); ...&#125;该方法在构建url的时候，会根据forceOriginalQueryStringEncoding这个值执行不同的操作，当为true的时候，调用getEncodedQueryString方法，如下图所示，获取QueryString12345private String getEncodedQueryString(HttpServletRequest request) &#123; String query = request.getQueryString(); return (query != null) ? "?" + query : ""; &#125;&#125;可以看到，getEncodedQueryString方法直接返回request.QueryString，将不会对请求参数进行编解码操作。而this.helper.getQueryString方法会对请求参数做编解码处理。因此，只需要将forceOriginalQueryStringEncoding设置为true即可。该参数可以在Zuul的properties属性中配置，该参数在构造SimpleHostRoutingFilter中初始化的时候，是通过调用properties.isForceOriginalQueryStringEncoding()方法来进行初始化的。302重定向问题使用HttpClient进行通讯的过程中，如果遇到302、301这一类的重定向，HttpClient会自动发起二次请求，而这个时候的请求源IP则变成了网关地址，会造成IP漂移需要重新登录，因此需要将HttpClient的自动重定向禁用。将HttpClient的初始化改成HttpClientBuilder.create().disableRedirectHandling().build();增加一个disableRedirectHandling方法即可。请求Body编码问题这个问题源于Android客户端登陆时候遇到的，使用IPhone客户端登陆成功，但是Android客户端登陆失败。通过跟踪发现，Android客户端通过Post请求上送数据的时候，ContentType为application/x-www-form-urlencoded，而body中的数据为JSON格式。网关在处理的时候，经过FormBodyWrapperFilter会对数据进行编码，将body中的JSON格式编码转换，因此后台服务收到的数据是不正确的。IPhone之所以能登陆成功，是因为ContentType传的是application/json，FormBodyWrapperFilter的ShouldFilter方法会自动跳过这种情况。为了兼容已经在生产的客户端版本，网关采用禁用该过滤器的方式来解决该问题。通过在application.properites文件中增加zuul.FormBodyWrapperFilter.pre.disable=true配置。X-Forward-For与Host采用@EnableZuulServer和@EnableZuulProxy的一个区别就是，当使用@EnableZuulProxy作为注解的时候，会执行PreDecorationFilter过滤器，在该过滤器中会对请求头部做一些处理，比如带上以下参数：FilterConstants.java1234567891011121314151617181920/** * X-Forwarded-For Header */public static final String X_FORWARDED_FOR_HEADER = "X-Forwarded-For";/** * X-Forwarded-Host Header */public static final String X_FORWARDED_HOST_HEADER = "X-Forwarded-Host";/** * X-Forwarded-Prefix Header */public static final String X_FORWARDED_PREFIX_HEADER = "X-Forwarded-Prefix";/** * X-Forwarded-Port Header */public static final String X_FORWARDED_PORT_HEADER = "X-Forwarded-Port";/** * X-Forwarded-Proto Header */public static final String X_FORWARDED_PROTO_HEADER = "X-Forwarded-Proto";而在ZuulProperites类中可以看到，addProxyHeaders默认为true，addHostHeader默认为false。所以采用@EnableZuulProxy作为注解的时候，会带上Forwarded相关头部信息，不会带上Host头部信息。ZuulProperites.java123456789 /** * Flag to determine whether the proxy adds X-Forwarded-* headers. */private boolean addProxyHeaders = true;/** * Flag to determine whether the proxy forwards the Host header. */private boolean addHostHeader = false;而本网关高度订制化，采用@EnableZuulServer作为注解，因此需要手动对所需Forward相关参数和Host进行处理。IIS Request.Url 带端口号的问题由于网关后台对接了asp.net的IIS服务，使用了.net中的Request.Url.AbsoluteUri方法来取值，这个方法会自动拼接Host和端口。网关在测试环境中将会遇到问题，例如测试环境是网关地址99.6.140.1:808，而后台.net服务器地址是99.6.163.3:888。即使在网关中将Host设置为99.6.140.1:808，通过上述方法取得的值还是，99.6.163.3:808，自动拼接上了.net目的地址的端口。此问题目前还未找到解决方案，网关无法解决，只能通过.net后台服务进行修改。Transfer-Encoding:chunked 与 Content-LengthContent-Encoding:Gzip 自动解压httpclient disableContentCompress]]></content>
       <categories>
-        <category>Zuul</category>
+        <category>Java</category>
       </categories>
       <tags>
         <tag>SpringCloud</tag>
@@ -220,7 +220,7 @@
     <url>%2F2019%2F01%2F16%2Fzuul%2F</url>
     <content type="text"><![CDATA[前言最近在研究SpringCloud Zuul的时候，发现通过 /routes无法查看路由信息，上网搜索了一些信息，发现都是低版本的SpringCloud的解决方案。Finchley版本和Greenwich版本并不适用。低版本的SpringCloud是基于springboot1 的版本，可以通过以下方式配置：1、引入spring-cloud-starter-zuul2、引入spring-boot-starter-actuator3、properties文件设置management.security.enabled=false4、访问/routes显示端点信息，访问/routes?format=details显示详细的端点信息SpringCloud高版本由于Finchley版本和Greenwich版本的Spring Cloud采用SpringBoot2.0，security的操作有改动，导致management.security.enabled=false会报错：Deprecated:A global security auto-configuration is now provided…”而且zuul的代码全部放到了Netflix包下，访问/routes的方式也有所变化，具体的操作步骤如下：1、引入spring-cloud-starter-netflix-zuul2、引入spring-boot-starter-actuator3、properties文件设置management.endpoints.web.exposure.include=*4、访问/actuator/routes显示端点信息，访问/actuator/routes/details显示详细的端点信息]]></content>
       <categories>
-        <category>SpringCloud</category>
+        <category>Java</category>
       </categories>
       <tags>
         <tag>微服务</tag>
@@ -232,7 +232,7 @@
     <url>%2F2019%2F01%2F14%2FRouteToRequestUrl%2F</url>
     <content type="text"><![CDATA[现状公司转型微服务架构，将之前机器上所有已部署微服务拆分集群部署。微服务地址采用资源管理平台统一管理维护，包括微服务IP、集群数据等，未采用服务注册与发现组件。需求1、从资源管理平台获取服务器IP地址等相关参数；2、相同源IP转发到相同服务器，采用IP Hash方式；实现SpringCloud Gateway支持自定义过滤器，通过继承RouteToRequestUrlFilter类来实现IP Hash。SpringCloud Gateway过滤器分为两类，Gateway Filter和Global Filter，前者是针对匹配命中的过滤，有两种方式来实现，实现GatewayFilter接口、继承AbstractGatewayFilterFactory类，后者是针对全局路由的过滤器，可以采用添加@Component注解的方式来注册。SpringCloud Gateway的全局过滤器如下图所示：我们需要做的就是实现一个自定义的全局过滤器CustomRouteToRequestUrlFilter，在该过滤器中设置IP Hash后的真实URL地址。代码如下：CustomRouteToRequestUrlFilter.java1234567891011121314151617181920212223@Component public class CustomRouteToRequestUrlFilter extends RouteToRequestUrlFilter &#123; private List&lt;String&gt; mUrlList = new ArrayList&lt;String&gt;() &#123; &#123; add("http://10.0.0.1"); add("http://10.0.0.2"); add("http://10.0.0.3"); &#125; &#125;; @Override public int getOrder() &#123; return 10001; &#125; @Override public Mono&lt;Void&gt; filter(ServerWebExchange exchange, GatewayFilterChain chain) &#123; ServerHttpRequest request = exchange.getRequest(); String address = request.getRemoteAddress().getAddress().getHostAddress(); int num = Math.abs(address.hashCode()) % mUrlList.size(); URI mergedUrl = URI.create(mUrlList.get(num)); exchange.getAttributes().put(ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR, mergedUrl); return chain.filter(exchange); &#125;&#125;以上代码可以进行优化，通过处理”x-forward-for”以获取真实IP地址。此处暂略。WebFlux通过ServerWebExchange类来处理Http Request和Http Response。首先取得IP地址，然后将IP地址做Hash得到一个整型，再根据服务器数量求余，最后得到所选择的服务器。以上代码需要注意的地方在于，需要设置Order为10001，大于RouteToRequestUrlFilter的返回值（10000），这样才能将优先级置于RouteToRequestUrlFilter之下。]]></content>
       <categories>
-        <category>SpringCloud</category>
+        <category>Java</category>
       </categories>
       <tags>
         <tag>微服务</tag>
@@ -244,7 +244,7 @@
     <url>%2F2019%2F01%2F09%2FgatewayRibbon%2F</url>
     <content type="text"><![CDATA[前言SpringCloud Gateway是Netflix旗下开源的API网关，项目比较新，网上资源也比较少，因此坑比较多吧。说到SpringCloud Gateway，肯定都会与Zuul进行对比。Zuul分为Zuul1和Zuul2两个版本，Zuul1是采用同步阻塞的方式，使用多线程来实现，而Zuul2则是采用异步非阻塞的事件驱动。SpringCloud Gateway与Zuul2一样，基于异步非阻塞的事件驱动。而SpringCloud Zuul则是采用的Zuul1这个同步阻塞的方式，可能是由于Zuul2出来比较慢，Netflix等不及了，就自己搞了一个异步非阻塞的SpringCloud Gateway。有人在Github提问，SpringCloud 后续是否会集成Zuul2，官方给了否定答复。既然都有了异步非阻塞的Gateway，那么也就没必要再集成Zuul2到SpringCloud了。两者的性能对比（zuul1和Gateway），https://github.com/spencergibb/spring-cloud-gateway-bench 。ProxyAvg LatencyAvg Req/Sec/Threadgateway6.61ms3.24klinkered7.62ms2.82kzuul12.56ms2.09knone2.09ms11.77k需求1、根据配置，将指定源IP路由到某台特定的服务器，以便灰度发布验证。2、采用Web端进行路由配置更新。3、默认规则，采用IP Hash路由到固定服务器。根据以上三个需求点，只需要使用API网关与负载均衡器，不需要服务注册与发现组件，因此需要采用静态URL进行路由配置。根据多方面权衡以及业务可行性分析，技术栈决定采用SpringCloud Gateway。原因有以下几点：1、Gateway支持 RemoteAddr Route Predicate Factory，可以满足需求点1。2、Gateway支持 Actuator API，支持RestFul刷新路由配置，可以满足需求点2。3、采用Ribbon，自定义路由规则，以及支持静态服务器地址配置，可以满足需求点3。实现application.yml12345678910111213141516171819202122spring: cloud: gateway: routes: -id: wpstan uri: lb://customRibbon predicates: -RemoteAddr=99.6.150.163ribbon: eureka: enabled: false //必须要关闭eureka的服务注册与发现customRibbon: ribbon: NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule //随机规则 listOfServers: http://99.12.98.215:8080,http://99.12.98.215:8081,http://99.12.98.215:8082management: endpoints: web: exposure: include: '*'//配置actuator api使用，暴露端点 第六行的lb表示匹配规则为loadBalance负载均衡，规则名为customRibbon。第十二行表示该负载均衡规则采用Ribbon，后面就是Ribbon的配置。主要就是listOfServers这个静态URL配置，由于我不需要去动态获取服务注册与发现，因此可以在此写死。需要注意的就是必须要把ribbon.eureka.enabled置为false。]]></content>
       <categories>
-        <category>SpringCloud</category>
+        <category>Java</category>
       </categories>
       <tags>
         <tag>微服务</tag>
@@ -260,7 +260,7 @@
       </categories>
       <tags>
         <tag>微服务</tag>
-        <tag>microservice</tag>
+        <tag>MicroService</tag>
       </tags>
   </entry>
   <entry>
@@ -291,10 +291,10 @@
     <url>%2F2018%2F11%2F28%2Fspringboot%2F</url>
     <content type="text"><![CDATA[前言作为一个SpringBoot新人，在学习中有诸多疑惑，慢慢梳理出来、但求拨云见日。SpringBoot和SpringSpring是容器，是管理对象生命周期的容器。开发的时候，由Spring容器来处理对象的生命周期。Spring容器能够帮助我们来管理生命周期的前提是我们需要对Spring进行配置。而SpringBoot的出现，简化了这种XML的配置过程，这也是SpringBoot的一大优势。当然，SpringBoot也不单单仅有这一个优势，更多的优势可以自行百度一下。HelloWorldSpringBoot自带了java web服务器，引入SpringBoot后，在main方法中注册Application启动类，即可运行。页面输出HelloWorld，需要配置一个@Controller，用来响应浏览器请求。控制器@Controller 用来处理http的请求，@RestController用来返回Json数据格式，@RequestMapping用来配置Url映射。可以使用GetMapping来简化Get操作。Controller1234567public class HelloController &#123; @RequestMapping(value = "/hello",method = RequestMethod.GET)//等价于@GetMapping(value="/hello") @ResponseBody public String sayHello() &#123; return "Hello，Spring Boot！"; &#125;&#125;当注解写成@RestController的时候，可以直接返回一个序列化的JSON对象。下面的代码将返回一个JSON格式的User对象。RestController12345678@RestController@RequestMapping("/config")public class ConfigController &#123; @RequestMapping("/hr") public User currentUser() &#123; return UserUtils.getCurrentUser(); &#125;&#125;Controller可以返回字符串，可以返回序JSON列化后的对象，那要怎么返回HTML页面呢？可以使用前端页面模板。thymeleaf首先在配置文件中引入thymeleaf的包，然后再Controller中编写响应请求代码，返回html的页面名字。其中，ModelMap是用来与Html页面进行数据交互的。Controller12345@RequestMapping(method = RequestMethod.GET)public String getBookList(ModelMap map) &#123; map.addAttribute("bookList",bookService.findAll()); return "bookList";&#125;bookList.html的页面部分内容如下所示：bookList.html1234567&lt;tr th:each="book : $&#123;bookList&#125;"&gt; &lt;th scope="row" th:text="$&#123;book.id&#125;"&gt;&lt;/th&gt; &lt;td&gt;&lt;a th:href="@&#123;/book/update/&#123;bookId&#125;(bookId=$&#123;book.id&#125;)&#125;" th:text="$&#123;book.name&#125;"&gt;&lt;/a&gt;&lt;/td&gt; &lt;td th:text="$&#123;book.writer&#125;"&gt;&lt;/td&gt; &lt;td th:text="$&#123;book.introduction&#125;"&gt;&lt;/td&gt; &lt;td&gt;&lt;a class="btn btn-danger" th:href="@&#123;/book/delete/&#123;bookId&#125;(bookId=$&#123;book.id&#125;)&#125;"&gt;删除&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;数据库操作SpringBoot可以方便的连接多种数据库，比如MySql，ElasticSearch等。在学习过程中梳理出了以下几个需要了解的点：ORM框架主流的有hibernate以及mybatis，区别在于前者无须写sql，通过对象操作数据库，后者通过编写更加灵活的sql语句来操作数据库。ORM是JPA规范中的一个思想体现，JPA规范包含了ORM。JPA、spring-data-jpa、hibernate三者之间的关系，JPA是Java Persistence API缩写，是JAVA持久化规范，spring-data-jpa对具体的JPA实现做了封装，默认采用hibernate实现，能够方便大家在不同的ORM框架之间进行切换而不需要更改代码。操作步骤：1、引入spring-data-jpa；2、编写Entity类；3、编写Repository类；4、调用方法Book.java123456789@Entitypublic class Book implements Serializable &#123; @Id @GeneratedValue private Long id; private String name; private String writer; ....get set ....BookRepository.java12345/** * Book 数据持久层操作接口 */public interface BookRepository extends JpaRepository&lt;Book, Long&gt; &#123;&#125;BookServiceImpl.java1234567891011121314/** * Book 业务层实现 */@Servicepublic class BookServiceImpl implements BookService &#123; @Autowired BookRepository bookRepository; @Override public List&lt;Book&gt; findAll() &#123; return bookRepository.findAll(); &#125;......从上面代码中可以看到，在业务服务层只需要引入BookRepository后，就可以操作数据库中相关数据，很方便。已经具备了搭建一套对外服务的功能，包括响应请求、操作数据、返回数据。代码结构规范的SpringBoot工程分层结构应该包括如下项：应用监控sprig-boot-starter-actuatorSpringCloud]]></content>
       <categories>
-        <category>学习笔记</category>
+        <category>Java</category>
       </categories>
       <tags>
-        <tag>springboot</tag>
+        <tag>SpringBoot</tag>
         <tag>学习笔记</tag>
       </tags>
   </entry>
