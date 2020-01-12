@@ -9,5 +9,5 @@ Disallow: /images/
 Disallow: /css/
 Disallow: /fonts/
 
-Sitemap: https://www.tanrd.com/sitemap.xml
-Sitemap: https://www.tanrd.com/baidusitemap.xml
+Sitemap: http://www.tanrd.com/sitemap.xml
+Sitemap: http://www.tanrd.com/baidusitemap.xml
