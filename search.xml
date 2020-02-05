@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[HTTP2.0中的二进制帧层原理]]></title>
+    <url>%2F2020%2F02%2F04%2Fhttp2%2F</url>
+    <content type="text"><![CDATA[前言Http2.0中涉及到一个二进制帧层，而OSI网络模型中有一个数据链路层，数据链路层的协议数据单元也叫做帧。然而两者并不是同一个东西，Http2.0是运行在TCP传输层之上的应用层。Http2.0中的二进制帧层其实可以看做是基于传输层和应用层之间的一个分层。Http1和Http2Http1.0 每一次请求都必须创建一个新的TCP连接。Http1.1 下一次请求可以沿用上一次请求的TCP连接，但是请求之间是串行的，必须等上一个请求结束后，下一个请求才能发起。Http2.0 可以将多个请求同时在一个TCP连接中发出。原理TCP层传输，是将上一层协议的数据分割成多个不同序号的报文进行传输，通过滑动窗口协议和一些ACK、Syn等字段进行全双工通信（两端需要对传输报文序号进行确认，双向通信，信道冲突时候可能会采用csma/cd等算法进行处理）。Http1.1 直接将字符形式的请求报文交付给TCP层进行传输，在应用层必须解析出请求head和body才能完成通信。Http2.0 将应用层的数据经过二进制帧层处理，将不同的请求拆成不同的stream，由stream的id进行标记，请求的stream被分割成多种类型的帧，其中包括head帧和data数据帧。正是因为有了stream的id标记、以及各种不同类型的帧，确保了请求和响应的有序重组。例如请求a.js和b.css，a.js对应的stream的id为1，b.css对应的stream的id为2，a.js的head帧为head1，数据帧为data1，b.js的head帧为head2，数据帧为data2。浏览器可以将head1、data1、head2、data2同时放入TCP信道进行报文传输，在TCP层，可能会进一步对这些数据进行拆分，拆成不同报文序号进行传输，但是可以无需关注这层是如何拆分、组装的。因为可以在Http2.0的二进制帧层进行有序处理，将接收到的stream的id为1的放一起处理，接收到的stream的id为2的放一起处理。通过这种方式就可以解决Http1.1中存在的请求阻塞问题，试想：假如a.js的处理很慢，服务器可以先将b.css的处理结果返回，因为采用了stream的id编号，所以可以在Http2.0的二进制帧层先对b.css的stream的id进行重组，将b.css的响应交付于应用层处理。总结Http2.0 引入了一个二进制帧层，将并发的请求转成不同的stream流传输，每个stream的分帧都带有特定的序号id，这就保证了请求响应的数据可以在二进制帧层进行重组，即使传输过程是无序的。]]></content>
+      <categories>
+        <category>学习笔记</category>
+      </categories>
+      <tags>
+        <tag>Http2.0</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[域名301重定向到www]]></title>
     <url>%2F2020%2F01%2F12%2F301_redirect%2F</url>
     <content type="text"><![CDATA[前言将博客部署到gitpage，访问速度是一个大问题，每次TTFB都是四五秒。因此，选用虚拟主机来部署静态html博客，加快博客访问速度，这个时候就会遇到一个SEO的问题。当我们在采用gitpage的时候，可以通过在根目录加一个CNAME文件，内容为www.tanrd.com ，github主机会自动将tanrd.com永久重定向到www.tanrd.com 。而在采用虚拟主机部署的时候，这个301重定向就需要自己来设置了。在阿里云设置域名解析的时候，既设置了根域名tanrd.com解析到主机，也设置了www.tanrd.com 解析到主机，然而搜索引擎收录的内容都是之前以www开头的域名。为了继续沿用一个域名作为SEO的主要域名，需要将不带www的域名解析到带www的域名。代码虚拟主机支持php解析，因此在hexo的_posts目录中增加一个index.php文件，同时在虚拟主机设置优先读取的首页为index.php。根据域名判断为tanrd.com的时候，在请求head中增加301重定向信息，当域名为www.tanrd.com 的时候，直接include返回hexo自动生成的index.html文件。&lt;?php $the_host = $_SERVER['HTTP_HOST']; $request_uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : ''; if($the_host == 'tanrd.com') { header('HTTP/1.1 301 Moved Permanently'); header('Location: http://www.tanrd.com'.$request_uri); }else{ //require('index.html'); require每次都首先加载，include执行到再加载 include('index.html'); } ?&gt;]]></content>
@@ -247,8 +258,8 @@
         <category>Java</category>
       </categories>
       <tags>
-        <tag>微服务</tag>
         <tag>SpringCloud</tag>
+        <tag>微服务</tag>
       </tags>
   </entry>
   <entry>
@@ -260,18 +271,6 @@
       </categories>
       <tags>
         <tag>微服务</tag>
-        <tag>MicroService</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title><![CDATA[2018年终总结]]></title>
-    <url>%2F2018%2F12%2F17%2F2018summary%2F</url>
-    <content type="text"><![CDATA[前言2018年是戊戌狗年，本人26周岁。工作硕士毕业两年半，这两年半一直在搞web。毕业前主要接触的是移动端开发，转型后开始搞Web开发。之前对JS、CSS接触的不多，基本是零经验。我比较喜欢思考其所以然，所以在转型中还是上手的比较快。由于公司偏稳重，目前Web端还是采用服务器渲染的方式，并没有做前后端分离。在用CSS画一些前端页面的时候，真心感觉不如Android的五大布局来得爽，后来接触到了Flex布局，才发现这个真是神器，什么布局都可以搞定。做了两年多Web开发，个人感觉Web开发比移动客户端开发有意思，移动端开发给人的感觉比较闭塞、基本就是移动端的性能调优、架构也只是源代码的架构，而Web端的涉及技术更多，更广。刚毕业那会，整个项目，几百号人，都是基于单体应用的开发模式，各个业务模块耦合严重，牵一发而动全身，上线投产也是很困难的事。庆幸的是直属领导技术在公司算不错的，对项目做了微服务化改造，把单体应用搞成了50多个微服务，开发运维效率有很大提高。今年前半年除了做业务需求，学习了一些前后端分离的概念和思想，接触了Node.js、webpack、MVVM框架的VUE以及响应式编程等，这些东西让我在后续开发微信小程序中获益不少。 由于后来这个前后端分离的改造给了别的组去搞，就没继续搞下去了。下半年开始接触Spring Cloud微服务，服务治理、API网关、负载均衡、容错限流等，Eureka、Consul、Nacos、Zuul、Hystrix等，很多微服务相关的技术都要开始慢慢学习，这也是明年要做的事。今年买了很多本关于微服务和spring的书籍，给人的感觉就是国外人写书写的通俗易懂，真正是教你学习。国内很多都是滥竽充数、代码占比接近一半，看的人累。举个例子：《spring 微服务实战》（spring microservices in action)、《spring cloud微服务实战》，后者是国内作者翟永超编写，差距是真大。小结，今年知识面广度有所增加，希望明年深度能进一步提升。生活领证了，结婚了，老婆的工作还是一如既往的忙。希望老婆来年能轻松一点，一起生个白白胖胖的孩子。今年跟老婆一起去了苏州、乌镇、迪士尼等周边游。老婆心心念的哈尔滨一直没去，有机会肯定会去的。今年最开心的事情除了领证结婚，就是父亲体检一切正常。]]></content>
-      <categories>
-        <category>年终总结</category>
-      </categories>
-      <tags>
-        <tag>2018</tag>
       </tags>
   </entry>
   <entry>

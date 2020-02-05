@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://www.tanrd.com/2020/02/04/http2/</loc>
+    
+    <lastmod>2020-02-05T04:33:26.515Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.tanrd.com/2019/01/03/micsvrintroduce/</loc>
+    
+    <lastmod>2020-02-05T03:34:32.971Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://www.tanrd.com/about/index.html</loc>
     
     <lastmod>2020-01-12T10:42:33.730Z</lastmod>
@@ -107,13 +121,6 @@
   </url>
   
   <url>
-    <loc>http://www.tanrd.com/2019/01/03/micsvrintroduce/</loc>
-    
-    <lastmod>2020-01-12T09:53:14.565Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://www.tanrd.com/2018/11/28/springboot/</loc>
     
     <lastmod>2020-01-12T09:52:56.389Z</lastmod>
@@ -180,13 +187,6 @@
     <loc>http://www.tanrd.com/2019/02/25/userandkernal/</loc>
     
     <lastmod>2019-02-25T01:21:38.203Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://www.tanrd.com/2018/12/17/2018summary/</loc>
-    
-    <lastmod>2018-12-29T09:33:10.301Z</lastmod>
     
   </url>
   
